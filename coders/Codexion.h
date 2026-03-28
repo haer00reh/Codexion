@@ -10,6 +10,7 @@
 
 bool str_checker(char *str);
 bool arg_checker(char **args);
+long	ft_atol(char *str);
 
 
 #endif

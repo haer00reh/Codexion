@@ -8,7 +8,7 @@ bool str_checker(char *str)
     i = 0;
     while (str[i])
     {
-        if (!(str[i] >= '0' && str[i] <= '9') && str[i] != ' ')
+        if (!(str[i] >= '0' && str[i] <= '9') && str[i] != ' ' && str[i] != '-' && str[i] != '+')
         {
             fprintf(stderr, "Error occured while checking, arguments passed are invalid!!\nPlease give valid arguments\n");
             fprintf(stderr, "found a non numeric character in one of arguments\n\nquitting...\n");
