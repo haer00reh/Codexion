@@ -16,7 +16,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex;
 	pthread_cond_t		cond;
-	int					in_use;
+	bool				in_use;
 	long				available_at;
 	int					id;
 }	t_dongle;
@@ -34,6 +34,28 @@ typedef struct s_heap
 	int			capacity;
 }	t_heap;
 
+typedef struct s_simulation
+{
+	struct s_coder	*coders;
+	t_dongle		*dongles;
+	pthread_t		monitor_thread;
+	long			simulation_start_time;
+	bool			stop;
+	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	stop_mutex;
+	pthread_mutex_t	counter_mutex;
+	long			fifo_sequence;
+
+	long	number_of_coders;
+	long	number_of_compiles_required;
+	long	time_to_burnout;
+	long	time_to_compile;
+	long	time_to_debug;
+	long	time_to_refactor;
+	long	dongle_cooldown;
+	char	*schedule;
+} 	t_simulation;
+
 typedef struct s_coder
 {
 	int					id;
@@ -44,5 +66,9 @@ typedef struct s_coder
 	t_dongle			*right_dongle;
 	struct s_simulation	*sim;
 }	t_coder;
+
+bool	arg_to_long(char *str, long *ret);
+bool	init_simulation_from_args(t_simulation *sim, char **av);
+void	destroy_simulation_runtime(t_simulation *sim);
 
 #endif
