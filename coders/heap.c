@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/01 17:30:16 by haer-reh          #+#    #+#             */
+/*   Updated: 2026/04/01 17:30:17 by haer-reh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Codexion.h"
 
-static void	swap_requests(t_request *a, t_request *b)
+void	swap_requests(t_request *a, t_request *b)
 {
 	t_request	tmp;
 
