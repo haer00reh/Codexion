@@ -20,6 +20,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+typedef struct s_coder t_coder;
+typedef struct s_heap t_heap;
+
 bool str_checker(char *str);
 bool arg_checker(char **args);
 long	ft_atol(char *str);
@@ -28,6 +31,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex;
 	pthread_cond_t		cond;
+	t_heap				waiting_heap;
 	bool				in_use;
 	long				available_at;
 	int					id;
@@ -35,7 +39,8 @@ typedef struct s_dongle
 
 typedef struct s_request
 {
-	int		coder_id;
+	t_coder *coder;
+	long sequence;
 	long	priority;
 }	t_request;
 
