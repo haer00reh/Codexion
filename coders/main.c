@@ -3,7 +3,7 @@
 
 bool	arg_to_long(char *str, long *ret)
 {
-	*ret = ft_atol(str);
+	*ret = atoi(str);
 
 	if (*ret < 0)
 	{

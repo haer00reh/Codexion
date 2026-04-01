@@ -33,8 +33,6 @@ long	ft_atol(char *str)
 	}
 	while (*str)
 	{
-		if (*str < '0' || *str > '9')
-            return 0;
 		nbr = (nbr * 10) + (*str - '0');
 		str++;
 	}
