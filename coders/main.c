@@ -43,16 +43,6 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 	sim->simulation_start_time = 0;
 	sim->stop = false;
 	sim->fifo_sequence = 0;
-
-	sim->coders = malloc(sizeof(t_coder) * sim->number_of_coders);
-	if (!sim->coders)
-		return (false);
-	sim->dongles = malloc(sizeof(t_dongle) * sim->number_of_coders);
-	if (!sim->dongles)
-	{
-		free(sim->coders);
-		return (false);
-	}
 	
 	ret = pthread_mutex_init(&sim->print_mutex, NULL);
 	if (ret != 0)
@@ -89,6 +79,7 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 	if (!init_dongles(sim))
 		return (destroy_simulation_runtime(sim), false);
 	sim->schedule = av[8];
+
 	return (true);
 }
 
@@ -96,6 +87,12 @@ bool init_dongles(t_simulation *sim)
 {
 	int i;
 
+	sim->dongles = malloc(sizeof(t_dongle) * sim->number_of_coders);
+	if (!sim->dongles)
+	{
+		free(sim->coders);
+		return (false);
+	}
 	i = 0;
 	while (i < sim->number_of_coders)
 	{
@@ -113,6 +110,9 @@ bool init_coder(t_simulation *sim)
 {
 	int i;
 
+	sim->coders = malloc(sizeof(t_coder) * sim->number_of_coders);
+	if (!sim->coders)
+		return (false);
 	i = 0;
 	while (i < sim->number_of_coders)
 	{
@@ -139,6 +139,8 @@ int main(int ac, char **av)
 		return -1;
 	if (!init_simulation_from_args(&sim, av))
 		return -1;
+
+	printf("%ld", sim.dongle_cooldown);
 	destroy_simulation_runtime(&sim);
 	return (0);
 }

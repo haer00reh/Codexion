@@ -82,5 +82,7 @@ typedef struct s_coder
 bool	arg_to_long(char *str, long *ret);
 bool	init_simulation_from_args(t_simulation *sim, char **av);
 void	destroy_simulation_runtime(t_simulation *sim);
+bool init_coder(t_simulation *sim);
+bool init_dongles(t_simulation *sim);
 
 #endif
