@@ -112,7 +112,12 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 		return (destroy_simulation_runtime(sim), false);
 	if (!init_coder(sim))
 		return (destroy_simulation_runtime(sim), false);
-	sim->schedule = av[8];
+	if (strcmp(av[8], "fifo") == 0)
+		sim->scheduler = FIFO;
+	else if (strcmp(av[8], "edf") == 0)
+		sim->scheduler = EDF;
+	else
+		return (destroy_simulation_runtime(sim), false);
 
 	return (true);
 }

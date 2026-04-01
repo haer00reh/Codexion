@@ -39,6 +39,12 @@ typedef struct s_request
 	long	priority;
 }	t_request;
 
+enum scheduler_type
+{
+	FIFO,
+	EDF
+};
+
 typedef struct s_heap
 {
 	t_request	*arr;
@@ -65,7 +71,7 @@ typedef struct s_simulation
 	long	time_to_debug;
 	long	time_to_refactor;
 	long	dongle_cooldown;
-	char	*schedule;
+	enum scheduler_type	scheduler;
 } 	t_simulation;
 
 typedef struct s_coder
