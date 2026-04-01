@@ -3,7 +3,7 @@
 
 bool	arg_to_long(char *str, long *ret)
 {
-	*ret = atoi(str);
+	*ret = ft_atol(str);
 
 	if (*ret < 0)
 	{
@@ -31,6 +31,17 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 	sim->simulation_start_time = 0;
 	sim->stop = false;
 	sim->fifo_sequence = 0;
+
+	sim->coders = malloc(sizeof(t_coder) * sim->number_of_coders);
+	if (!sim->coders)
+		return (false);
+	sim->dongles = malloc(sizeof(t_dongle) * sim->number_of_coders);
+	if (!sim->dongles)
+	{
+		free(sim->coders);
+		return (false);
+	}
+	
 	ret = pthread_mutex_init(&sim->print_mutex, NULL);
 	if (ret != 0)
 		return (false);
@@ -61,10 +72,49 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 		return (destroy_simulation_runtime(sim), false);
 	if (!arg_to_long(av[7], &sim->dongle_cooldown))
 		return (destroy_simulation_runtime(sim), false);
+	if (!init_coder(sim))
+		return (destroy_simulation_runtime(sim), false);
+	if (!init_dongles(sim))
+		return (destroy_simulation_runtime(sim), false);
 	sim->schedule = av[8];
 	return (true);
 }
 
+bool init_dongles(t_simulation *sim)
+{
+	int i;
+
+	i = 0;
+	while (i < sim->number_of_coders)
+	{
+		sim->dongles[i].id = i + 1;
+		sim->dongles[i].in_use = false;
+		sim->dongles[i].available_at = 0;
+		pthread_mutex_init(&sim->dongles[i].mutex, NULL);
+		pthread_cond_init(&sim->dongles[i].cond, NULL);
+		i++;
+	}
+	return (true);
+}
+
+bool init_coder(t_simulation *sim)
+{
+	int i;
+
+	i = 0;
+	while (i < sim->number_of_coders)
+	{
+		sim->coders[i].id = i + 1;
+		sim->coders[i].thread = 0;
+		sim->coders[i].last_compile_start = 0;
+		sim->coders[i].compiles_done = 0;
+		sim->coders[i].left_dongle = &sim->dongles[i];
+		sim->coders[i].right_dongle = &sim->dongles[(i + 1) % sim->number_of_coders];
+		sim->coders[i].sim = sim;
+		i++;
+	}
+	return (true);
+}
 
 int main(int ac, char **av)
 {
