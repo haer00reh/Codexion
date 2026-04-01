@@ -108,9 +108,9 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 		return (destroy_simulation_runtime(sim), false);
 	if (!arg_to_long(av[7], &sim->dongle_cooldown))
 		return (destroy_simulation_runtime(sim), false);
-	if (!init_coder(sim))
-		return (destroy_simulation_runtime(sim), false);
 	if (!init_dongles(sim))
+		return (destroy_simulation_runtime(sim), false);
+	if (!init_coder(sim))
 		return (destroy_simulation_runtime(sim), false);
 	sim->schedule = av[8];
 
