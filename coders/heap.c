@@ -68,14 +68,14 @@ void	heapify_down(t_heap *heap, int child)
 	}
 }
 
-int	heap_init(t_heap *heap, int capacity)
+bool	heap_init(t_heap *heap, int capacity)
 {
 	heap->arr = malloc(sizeof(t_request) * capacity);
 	if (!heap->arr)
-		return (0);
+		return (false);
 	heap->size = 0;
 	heap->capacity = capacity;
-	return (1);
+	return (true);
 }
 
 void	heap_destroy(t_heap *heap)
@@ -86,22 +86,22 @@ void	heap_destroy(t_heap *heap)
 	heap->capacity = 0;
 }
 
-int	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence)
+bool	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence)
 {
 	if (heap->size >= heap->capacity)
-		return (0);
+		return (false);
 	heap->arr[heap->size].sequence = sequence;
 	heap->arr[heap->size].coder = coder;
 	heap->arr[heap->size].priority = priority;
 	heapify_up(heap, heap->size);
 	heap->size++;
-	return (1);
+	return (true);
 }
 
-int	heap_pop_min(t_heap *heap, t_request *out)
+bool	heap_pop_min(t_heap *heap, t_request *out)
 {
 	if (heap->size == 0)
-		return (0);
+		return (false);
 	*out = heap->arr[0];
 	heap->size--;
 	if (heap->size > 0)
@@ -109,10 +109,8 @@ int	heap_pop_min(t_heap *heap, t_request *out)
 		heap->arr[0] = heap->arr[heap->size];
 		heapify_down(heap, 0);
 	}
-	return (1);
+	return (true);
 }
-
-
 
 // debugging
 

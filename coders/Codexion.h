@@ -67,7 +67,7 @@ typedef struct s_simulation
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	stop_mutex;
 	pthread_mutex_t	counter_mutex;
-	long			fifo_sequence;
+	long			global_sequence;
 
 	long	number_of_coders;
 	long	number_of_compiles_required;
@@ -91,11 +91,11 @@ typedef struct s_coder
 }	t_coder;
 
 bool request_less(t_request a, t_request b);
-int	heap_init(t_heap *heap, int capacity);
+bool	heap_init(t_heap *heap, int capacity);
 void	heap_destroy(t_heap *heap);
-int	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence);
-int	heap_pop_min(t_heap *heap, t_request *out);
-bool swap_requests(t_request *a, t_request *b);
+bool	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence);
+bool	heap_pop_min(t_heap *heap, t_request *out);
+void swap_requests(t_request *a, t_request *b);
 bool arg_to_long(char *str, long *ret);
 void	heapify_down(t_heap *heap, int child);
 void	heapify_up(t_heap *heap, int child);

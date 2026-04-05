@@ -35,7 +35,20 @@ bool init_dongles(t_simulation *sim)
 
 	while (i < sim->number_of_coders)
 	{
-		heap_init(&sim->dongles[i].waiting_heap, sim->number_of_coders);
+		// risky cleanup block
+		if (!heap_init(&sim->dongles[i].waiting_heap, sim->number_of_coders))
+		{
+			while (i > 0)
+			{
+				heap_destroy(&sim->dongles[i - 1].waiting_heap);
+				pthread_mutex_destroy(&sim->dongles[i - 1].mutex);
+				pthread_cond_destroy(&sim->dongles[i - 1].cond);
+				i--;
+			}
+			free(sim->dongles);
+			free(sim->coders);
+			return (false);
+		}
 		sim->dongles[i].id = i + 1;
 		sim->dongles[i].in_use = false;
 		sim->dongles[i].available_at = 0;
@@ -44,6 +57,39 @@ bool init_dongles(t_simulation *sim)
 		i++;
 	}
 	return (true);
+}
+
+long get_timestamp_ms(void)
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+}
+
+void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
+{
+	pthread_mutex_lock(&dongle->mutex);
+	if (sim->scheduler == FIFO)
+	{
+		pthread_mutex_lock(&sim->counter_mutex);
+		heap_push(&dongle->waiting_heap, coder, 0, sim->global_sequence++);
+		pthread_mutex_unlock(&sim->counter_mutex);
+	}
+	else if (sim->scheduler == EDF)
+	{
+	long priority;
+
+	if (sim->scheduler == FIFO)
+		priority = 0;
+	else
+		priority = coder->last_compile_start + sim->time_to_burnout;
+
+	pthread_mutex_lock(&sim->counter_mutex);
+	heap_push(&dongle->waiting_heap, coder, priority, sim->global_sequence++);
+	pthread_mutex_unlock(&sim->counter_mutex);
+	}
+	pthread_mutex_unlock(&dongle->mutex);   
+
 }
 
 bool init_coder(t_simulation *sim)
