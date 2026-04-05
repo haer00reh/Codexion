@@ -31,7 +31,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex;
 	pthread_cond_t		cond;
-	t_heap				*waiting_heap;
+	t_heap				waiting_heap;
 	bool				in_use;
 	long				available_at;
 	int					id;
@@ -91,7 +91,14 @@ typedef struct s_coder
 }	t_coder;
 
 bool request_less(t_request a, t_request b);
-
+int	heap_init(t_heap *heap, int capacity);
+void	heap_destroy(t_heap *heap);
+int	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence);
+int	heap_pop_min(t_heap *heap, t_request *out);
+bool swap_requests(t_request *a, t_request *b);
+bool arg_to_long(char *str, long *ret);
+void	heapify_down(t_heap *heap, int child);
+void	heapify_up(t_heap *heap, int child);
 bool	arg_to_long(char *str, long *ret);
 bool	init_simulation_from_args(t_simulation *sim, char **av);
 void	destroy_simulation_runtime(t_simulation *sim);

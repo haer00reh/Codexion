@@ -32,8 +32,10 @@ bool init_dongles(t_simulation *sim)
 		return (false);
 	}
 	i = 0;
+
 	while (i < sim->number_of_coders)
 	{
+		heap_init(&sim->dongles[i].waiting_heap, sim->number_of_coders);
 		sim->dongles[i].id = i + 1;
 		sim->dongles[i].in_use = false;
 		sim->dongles[i].available_at = 0;
