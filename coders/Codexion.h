@@ -31,7 +31,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex;
 	pthread_cond_t		cond;
-	t_heap				waiting_heap;
+	t_heap				*waiting_heap;
 	bool				in_use;
 	long				available_at;
 	int					id;
@@ -89,6 +89,8 @@ typedef struct s_coder
 	t_dongle			*right_dongle;
 	struct s_simulation	*sim;
 }	t_coder;
+
+bool request_less(t_request a, t_request b);
 
 bool	arg_to_long(char *str, long *ret);
 bool	init_simulation_from_args(t_simulation *sim, char **av);

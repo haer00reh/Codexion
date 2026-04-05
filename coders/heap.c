@@ -21,21 +21,30 @@ void	swap_requests(t_request *a, t_request *b)
 	*b = tmp;
 }
 
-void	heapify_up(t_heap *heap, int index)
+void	heapify_up(t_heap *heap, int child)
 {
 	int	parent;
 
-	while (index > 0)
+	while (child > 0)
 	{
-		parent = (index - 1) / 2;
-		if (heap->arr[parent].priority <= heap->arr[index].priority)
+		parent = (child - 1) / 2;
+		if (!request_less(heap->arr[child], heap->arr[parent]))
 			break ;
-		swap_requests(&heap->arr[parent], &heap->arr[index]);
-		index = parent;
+		swap_requests(&heap->arr[parent], &heap->arr[child]);
+		child = parent;
 	}
 }
 
-void	heapify_down(t_heap *heap, int index)
+bool request_less(t_request a, t_request b)
+{
+	if (a.priority < b.priority)
+		return (true);
+	if (a.priority == b.priority && a.sequence < b.sequence)
+		return (true);
+	return (false);
+}
+
+void	heapify_down(t_heap *heap, int child)
 {
 	int	left;
 	int	right;
@@ -43,19 +52,19 @@ void	heapify_down(t_heap *heap, int index)
 
 	while (1)
 	{
-		left = index * 2 + 1;
-		right = index * 2 + 2;
-		smallest = index;
+		left = child * 2 + 1;
+		right = child * 2 + 2;
+		smallest = child;
 		if (left < heap->size
-			&& heap->arr[left].priority < heap->arr[smallest].priority)
+			&& request_less(heap->arr[left], heap->arr[smallest]))
 			smallest = left;
 		if (right < heap->size
-			&& heap->arr[right].priority < heap->arr[smallest].priority)
+			&& request_less(heap->arr[right], heap->arr[smallest]))
 			smallest = right;
-		if (smallest == index)
+		if (smallest == child)
 			break ;
-		swap_requests(&heap->arr[index], &heap->arr[smallest]);
-		index = smallest;
+		swap_requests(&heap->arr[child], &heap->arr[smallest]);
+		child = smallest;
 	}
 }
 
@@ -77,11 +86,12 @@ void	heap_destroy(t_heap *heap)
 	heap->capacity = 0;
 }
 
-int	heap_push(t_heap *heap, int coder_id, long priority)
+int	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence)
 {
 	if (heap->size >= heap->capacity)
 		return (0);
-	heap->arr[heap->size].coder_id = coder_id;
+	heap->arr[heap->size].sequence = sequence;
+	heap->arr[heap->size].coder = coder;
 	heap->arr[heap->size].priority = priority;
 	heapify_up(heap, heap->size);
 	heap->size++;
@@ -103,19 +113,52 @@ int	heap_pop_min(t_heap *heap, t_request *out)
 }
 
 
-//debug func
-void	print_heap_array(t_heap *heap)
-{
-	int	i;
 
-	i = 0;
-	while (i < heap->size)
-	{
-		printf("[%d: coder=%d prio=%ld] ",
-			i,
-			heap->arr[i].coder_id,
-			heap->arr[i].priority);
-		i++;
-	}
-	printf("\n");
-}
+// debugging
+
+
+// int	main(void)
+// {
+// 	t_heap		heap;
+// 	t_request	out;
+
+// 	t_coder c1 = {.id = 1};
+// 	t_coder c2 = {.id = 2};
+// 	t_coder c3 = {.id = 3};
+// 	t_coder c4 = {.id = 4};
+
+// 	printf("==== TEST 1: priority order ====\n");
+
+// 	heap_init(&heap, 10);
+
+// 	heap_push(&heap, &c1, 30, 1);
+// 	heap_push(&heap, &c2, 10, 2);
+// 	heap_push(&heap, &c3, 20, 3);
+
+// 	while (heap_pop_min(&heap, &out))
+// 		printf("id=%d prio=%ld seq=%ld\n",
+// 			out.coder->id,
+// 			out.priority,
+// 			out.sequence);
+
+// 	heap_destroy(&heap);
+
+// 	printf("\n==== TEST 2: same priority, sequence order ====\n");
+
+// 	heap_init(&heap, 10);
+
+// 	heap_push(&heap, &c1, 10, 2);
+// 	heap_push(&heap, &c2, 10, 1);
+// 	heap_push(&heap, &c3, 10, 3);
+// 	heap_push(&heap, &c4, 10, 0);
+
+// 	while (heap_pop_min(&heap, &out))
+// 		printf("id=%d prio=%ld seq=%ld\n",
+// 			out.coder->id,
+// 			out.priority,
+// 			out.sequence);
+
+// 	heap_destroy(&heap);
+
+// 	return (0);
+// }
