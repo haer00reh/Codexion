@@ -12,6 +12,45 @@
 
 #include "Codexion.h"
 
+bool acquire_dongle(t_coder *coder, t_dongle *dongle)
+{
+	pthread_mutex_lock(&dongle->mutex);
+	submit_request(coder, dongle);
+	while (true)
+	{
+		if (can_take_dongle(coder, dongle))
+		{
+			dongle->in_use = true;
+			heap_pop(&dongle->waiting_heap);
+			
+			pthread_mutex_unlock(&dongle->mutex);
+			return (true);
+		}
+		pthread_cond_wait(&dongle->cond, &dongle->mutex);
+	}
+	pthread_mutex_unlock(&dongle->mutex);
+	return (false);
+}
+
+bool can_take_dongle(t_coder *coder, t_dongle *dongle)
+{
+	if (dongle->waiting_heap.size == 0)
+		return (false);
+	else if (dongle->in_use)
+		return (false);
+	else if (get_timestamp_ms() < dongle->available_at)
+		return (false);
+	else if (!heap_peek(coder, dongle))
+		return (false);
+	return (true);
+}
+
+void waiting_cond_loop(t_simulation *sim)
+{
+
+
+
+}
 
 int main(int ac, char **av)
 {

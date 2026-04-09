@@ -12,6 +12,7 @@
 
 #include "Codexion.h"
 
+
 void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->mutex);
