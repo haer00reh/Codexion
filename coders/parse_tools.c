@@ -66,31 +66,6 @@ long get_timestamp_ms(void)
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
-{
-	pthread_mutex_lock(&dongle->mutex);
-	if (sim->scheduler == FIFO)
-	{
-		pthread_mutex_lock(&sim->counter_mutex);
-		heap_push(&dongle->waiting_heap, coder, 0, sim->global_sequence++);
-		pthread_mutex_unlock(&sim->counter_mutex);
-	}
-	else if (sim->scheduler == EDF)
-	{
-	long priority;
-
-	if (sim->scheduler == FIFO)
-		priority = 0;
-	else
-		priority = coder->last_compile_start + sim->time_to_burnout;
-
-	pthread_mutex_lock(&sim->counter_mutex);
-	heap_push(&dongle->waiting_heap, coder, priority, sim->global_sequence++);
-	pthread_mutex_unlock(&sim->counter_mutex);
-	}
-	pthread_mutex_unlock(&dongle->mutex);   
-
-}
 
 bool init_coder(t_simulation *sim)
 {
