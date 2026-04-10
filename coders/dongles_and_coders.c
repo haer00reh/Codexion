@@ -15,7 +15,6 @@
 
 void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
 {
-	pthread_mutex_lock(&dongle->mutex);
 	if (sim->scheduler == FIFO)
 	{
 		pthread_mutex_lock(&sim->counter_mutex);
@@ -31,7 +30,6 @@ void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
 	heap_push(&dongle->waiting_heap, coder, priority, sim->global_sequence++);
 	pthread_mutex_unlock(&sim->counter_mutex);
 	}
-	pthread_mutex_unlock(&dongle->mutex);
 
 }
 

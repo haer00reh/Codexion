@@ -15,13 +15,13 @@
 bool acquire_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->mutex);
-	submit_request(coder, dongle);
+	request_submission(coder->sim, coder, dongle);
 	while (true)
 	{
 		if (can_take_dongle(coder, dongle))
 		{
 			dongle->in_use = true;
-			heap_pop(&dongle->waiting_heap);
+			heap_pop_min(&dongle->waiting_heap);
 			
 			pthread_mutex_unlock(&dongle->mutex);
 			return (true);
@@ -45,11 +45,13 @@ bool can_take_dongle(t_coder *coder, t_dongle *dongle)
 	return (true);
 }
 
-void waiting_cond_loop(t_simulation *sim)
+void release_dongle(t_coder *coder, t_dongle *dongle)
 {
-
-
-
+	pthread_mutex_lock(&dongle->mutex);
+	dongle->in_use = false;
+	dongle->available_at = get_timestamp_ms() + coder->sim->dongle_cooldown;
+	pthread_cond_broadcast(&dongle->cond);
+	pthread_mutex_unlock(&dongle->mutex);
 }
 
 int main(int ac, char **av)

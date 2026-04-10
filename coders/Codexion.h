@@ -59,12 +59,12 @@ typedef struct s_heap
 
 typedef struct s_simulation
 {
-	struct s_coder	*coders;
-	t_dongle		*dongles;
-	pthread_t		monitor_thread;
-	long			simulation_start_time;
-	bool			stop;
-	pthread_mutex_t	print_mutex;
+	t_coder			*coders;
+	t_dongle			*dongles;
+	pthread_t			monitor_thread;
+	long				simulation_start_time;
+	bool				stop;
+	pthread_mutex_t		print_mutex;
 	pthread_mutex_t	stop_mutex;
 	pthread_mutex_t	counter_mutex;
 	long			global_sequence;

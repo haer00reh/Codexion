@@ -98,17 +98,13 @@ bool	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence)
 	return (true);
 }
 
-bool	heap_pop_min(t_heap *heap, t_request *out)
+bool	heap_pop_min(t_heap *heap)
 {
 	if (heap->size == 0)
 		return (false);
-	*out = heap->arr[0];
 	heap->size--;
-	if (heap->size > 0)
-	{
-		heap->arr[0] = heap->arr[heap->size];
-		heapify_down(heap, 0);
-	}
+	heap->arr[0] = heap->arr[heap->size];
+	heapify_down(heap, 0);
 	return (true);
 }
 
