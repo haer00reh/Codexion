@@ -19,23 +19,16 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/time.h>
 
 typedef struct s_coder t_coder;
 typedef struct s_heap t_heap;
+typedef struct s_request t_request;
 
 bool str_checker(char *str);
 bool arg_checker(char **args);
 long	ft_atol(char *str);
-
-typedef struct s_dongle
-{
-	pthread_mutex_t		mutex;
-	pthread_cond_t		cond;
-	t_heap				waiting_heap;
-	bool				in_use;
-	long				available_at;
-	int					id;
-}	t_dongle;
+long	get_timestamp_ms(void);
 
 typedef struct s_request
 {
@@ -56,6 +49,16 @@ typedef struct s_heap
 	int			size;
 	int			capacity;
 }	t_heap;
+
+typedef struct s_dongle
+{
+	pthread_mutex_t		mutex;
+	pthread_cond_t		cond;
+	t_heap				waiting_heap;
+	bool				in_use;
+	long				available_at;
+	int					id;
+}	t_dongle;
 
 typedef struct s_simulation
 {
@@ -94,7 +97,7 @@ bool request_less(t_request a, t_request b);
 bool	heap_init(t_heap *heap, int capacity);
 void	heap_destroy(t_heap *heap);
 bool	heap_push(t_heap *heap, t_coder *coder, long priority, long sequence);
-bool	heap_pop_min(t_heap *heap, t_request *out);
+bool	heap_pop_min(t_heap *heap);
 void swap_requests(t_request *a, t_request *b);
 bool arg_to_long(char *str, long *ret);
 void	heapify_down(t_heap *heap, int child);
@@ -104,5 +107,11 @@ bool	init_simulation_from_args(t_simulation *sim, char **av);
 void	destroy_simulation_runtime(t_simulation *sim);
 bool init_coder(t_simulation *sim);
 bool init_dongles(t_simulation *sim);
+void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle);
+bool heap_peek(t_coder *coder, t_dongle *dongle);
+bool can_take_dongle(t_coder *coder, t_dongle *dongle);
+bool acquire_dongle(t_coder *coder, t_dongle *dongle);
+void release_dongle(t_coder *coder, t_dongle *dongle);
+void *runtime_coder_routine(void *arg);
 
 #endif

@@ -99,7 +99,7 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 	sim->monitor_thread = 0;
 	sim->simulation_start_time = 0;
 	sim->stop = false;
-	sim->fifo_sequence = 0;
+	sim->global_sequence = 0;
 	
 	ret = pthread_mutex_init(&sim->print_mutex, NULL);
 	if (ret != 0)
