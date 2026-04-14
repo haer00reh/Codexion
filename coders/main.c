@@ -121,6 +121,7 @@ static void	join_coder_threads(t_simulation *sim)
 		i++;
 	}
 }
+
 bool acquire_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->mutex);
@@ -168,6 +169,7 @@ void release_dongle(t_coder *coder, t_dongle *dongle)
 	pthread_cond_broadcast(&dongle->cond);
 	pthread_mutex_unlock(&dongle->mutex);
 }
+
 int main(int ac, char **av)
 {
 	t_simulation	sim;

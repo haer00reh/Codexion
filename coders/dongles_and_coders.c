@@ -25,10 +25,17 @@ void	print_coder_state(t_coder *coder, const char *state)
 	pthread_mutex_unlock(&coder->sim->print_mutex);
 }
 
-static void	sleep_ms(long ms)
+static void	sleep_ms(long ms, t_simulation *sim)
 {
-	if (ms > 0)
-		usleep(ms * 1000);
+	long	start;
+
+	start = get_timestamp_ms();
+	while (get_timestamp_ms() - start < ms)
+	{
+		if (sim->stop)
+			break;
+		usleep(100);
+	}
 }
 
 void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
@@ -70,7 +77,8 @@ void *runtime_coder_routine(void *arg)
 	{
 		if (!acquire_dongle(coder, first))
 			break;
-		print_coder_state(coder, "has taken a dongle");
+		if (!sim->stop)
+			print_coder_state(coder, "has taken a dongle");
 
 		if (second != first)
 		{
@@ -79,12 +87,16 @@ void *runtime_coder_routine(void *arg)
 				release_dongle(coder, first);
 				break;
 			}
-			print_coder_state(coder, "has taken a dongle");
+			if (!sim->stop)
+				print_coder_state(coder, "has taken a dongle");
 		}
 
 		coder->last_compile_start = get_timestamp_ms();
-		print_coder_state(coder, "is compiling");
-		sleep_ms(sim->time_to_compile);
+		if (!sim->stop)
+		{
+			print_coder_state(coder, "is compiling");
+			sleep_ms(sim->time_to_compile, sim);
+		}
 
 		release_dongle(coder, first);
 		if (second != first)
@@ -92,11 +104,17 @@ void *runtime_coder_routine(void *arg)
 
 		coder->compiles_done++;
 
-		print_coder_state(coder, "is debugging");
-		sleep_ms(sim->time_to_debug);
+		if (!sim->stop)
+		{
+			print_coder_state(coder, "is debugging");
+			sleep_ms(sim->time_to_debug, sim);
+		}
 
+		if (!sim->stop)
+		{
 		print_coder_state(coder, "is refactoring");
-		sleep_ms(sim->time_to_refactor);
+		sleep_ms(sim->time_to_refactor, sim);
+		}
 	}
 
 	return (NULL);
