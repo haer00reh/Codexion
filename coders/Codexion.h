@@ -108,10 +108,12 @@ void	destroy_simulation_runtime(t_simulation *sim);
 bool init_coder(t_simulation *sim);
 bool init_dongles(t_simulation *sim);
 void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle);
-bool heap_peek(t_coder *coder, t_dongle *dongle);
+bool can_take_dongle(t_coder *coder, t_dongle *dongle);
 bool can_take_dongle(t_coder *coder, t_dongle *dongle);
 bool acquire_dongle(t_coder *coder, t_dongle *dongle);
 void release_dongle(t_coder *coder, t_dongle *dongle);
 void *runtime_coder_routine(void *arg);
+void *burn_out_monitor(void *arg);
+void	print_coder_state(t_coder *coder, const char *state);
 
 #endif

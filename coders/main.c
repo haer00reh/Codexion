@@ -55,6 +55,38 @@ static bool	start_coder_threads(t_simulation *sim)
 	return (true);
 }
 
+void *burn_out_monitor(void *arg)
+{
+	t_simulation *sim = (t_simulation *)arg;
+	long current_time;
+	int i;
+
+	i = 0;
+	current_time = get_timestamp_ms();
+	while (!sim->stop)
+	{
+		while(i < sim->number_of_coders)
+		{
+			current_time = get_timestamp_ms();
+			if (current_time - sim->coders[i].last_compile_start >= sim->time_to_burnout)
+			{
+				print_coder_state(&sim->coders[i], "has burned out");
+				sim->stop = true;
+				break ;
+			}
+			i++;
+		}
+		usleep(1000);
+	}
+	return (NULL);
+}
+
+void start_monitor_thread(t_simulation *sim)
+{
+	pthread_create(&sim->monitor_thread, NULL, burn_out_monitor, sim);
+	pthread_join(sim->monitor_thread, NULL);
+}
+
 static void	join_coder_threads(t_simulation *sim)
 {
 	int	i;
@@ -91,11 +123,11 @@ bool can_take_dongle(t_coder *coder, t_dongle *dongle)
 {
 	if (dongle->waiting_heap.size == 0)
 		return (false);
-	else if (dongle->in_use)
+	if (dongle->in_use)
 		return (false);
-	else if (get_timestamp_ms() < dongle->available_at)
+	if (get_timestamp_ms() < dongle->available_at)
 		return (false);
-	else if (!heap_peek(coder, dongle))
+	if (dongle->waiting_heap.arr[0].coder != coder)
 		return (false);
 	return (true);
 }
@@ -127,6 +159,7 @@ int main(int ac, char **av)
 		return (-1);
 	}
 	join_coder_threads(&sim);
+	start_monitor_thread(&sim);
 
 	destroy_simulation_runtime(&sim);
 	return (0);
