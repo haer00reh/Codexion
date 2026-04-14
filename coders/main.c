@@ -82,11 +82,13 @@ void *burn_out_monitor(void *arg)
 			if (sim->time_to_burnout > 0 &&
 				current_time - sim->coders[i].last_compile_start >= sim->time_to_burnout)
 			{
-				print_coder_state(&sim->coders[i], "burned out");
 
+				pthread_mutex_lock(&sim->print_mutex);
+				printf("%ld %d is burned out\n", current_time - sim->simulation_start_time, sim->coders[i].id);
 				pthread_mutex_lock(&sim->stop_mutex);
 				sim->stop = true;
 				pthread_mutex_unlock(&sim->stop_mutex);
+				pthread_mutex_unlock(&sim->print_mutex);
 
 				i = 0;
 				while (i < sim->number_of_coders)

@@ -11,17 +11,27 @@
 /* ************************************************************************** */
 
 #include "Codexion.h"
-
 void	print_coder_state(t_coder *coder, const char *state)
 {
 	long	timestamp;
 
-	timestamp = get_timestamp_ms();
 	pthread_mutex_lock(&coder->sim->print_mutex);
+
+	pthread_mutex_lock(&coder->sim->stop_mutex);
+	if (coder->sim->stop)
+	{
+		pthread_mutex_unlock(&coder->sim->stop_mutex);
+		pthread_mutex_unlock(&coder->sim->print_mutex);
+		return;
+	}
+	pthread_mutex_unlock(&coder->sim->stop_mutex);
+
+	timestamp = get_timestamp_ms();
 	printf("%ld %d %s\n",
 		timestamp - coder->sim->simulation_start_time,
 		coder->id,
 		state);
+
 	pthread_mutex_unlock(&coder->sim->print_mutex);
 }
 
@@ -77,6 +87,7 @@ void *runtime_coder_routine(void *arg)
 	{
 		if (!acquire_dongle(coder, first))
 			break;
+
 		if (!sim->stop)
 			print_coder_state(coder, "has taken a dongle");
 
@@ -110,11 +121,8 @@ void *runtime_coder_routine(void *arg)
 			sleep_ms(sim->time_to_debug, sim);
 		}
 
-		if (!sim->stop)
-		{
 		print_coder_state(coder, "is refactoring");
 		sleep_ms(sim->time_to_refactor, sim);
-		}
 	}
 
 	return (NULL);
