@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   heap.c                                             :+:      :+:    :+:   */
+/*   dongles_and_coders.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 17:30:16 by haer-reh          #+#    #+#             */
-/*   Updated: 2026/04/01 17:30:17 by haer-reh         ###   ########.fr       */
+/*   Updated: 2026/04/19 09:58:44 by haer-reh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,10 @@ void *runtime_coder_routine(void *arg)
 		first = coder->right_dongle;
 		second = coder->left_dongle;
 	}
+	coder->compiles_done = 0;
 	while (!sim->stop && coder->compiles_done < sim->number_of_compiles_required)
 	{
+		coder->last_compile_start = get_timestamp_ms();
 		if (!acquire_dongle(coder, first))
 			break;
 
@@ -102,7 +104,6 @@ void *runtime_coder_routine(void *arg)
 				print_coder_state(coder, "has taken a dongle");
 		}
 
-		coder->last_compile_start = get_timestamp_ms();
 		if (!sim->stop)
 		{
 			print_coder_state(coder, "is compiling");
@@ -113,8 +114,6 @@ void *runtime_coder_routine(void *arg)
 		if (second != first)
 			release_dongle(coder, second);
 
-		coder->compiles_done++;
-
 		if (!sim->stop)
 		{
 			print_coder_state(coder, "is debugging");
@@ -123,6 +122,8 @@ void *runtime_coder_routine(void *arg)
 
 		print_coder_state(coder, "is refactoring");
 		sleep_ms(sim->time_to_refactor, sim);
+		coder->compiles_done++;
+
 	}
 
 	return (NULL);
