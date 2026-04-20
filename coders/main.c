@@ -105,7 +105,7 @@ void *burn_out_monitor(void *arg)
 			pthread_mutex_unlock(&sim->stop_mutex);
 			break;
 		}
-		usleep(100);
+		usleep(10);
 	}
 	return (NULL);
 }
@@ -178,6 +178,7 @@ void release_dongle(t_coder *coder, t_dongle *dongle)
 int main(int ac, char **av)
 {
 	t_simulation	sim;
+	int			i;
 
 	(void)ac;
 	memset(&sim, 0, sizeof(sim));
@@ -188,6 +189,12 @@ int main(int ac, char **av)
 		return (-1);
 
 	sim.simulation_start_time = get_timestamp_ms();
+	i = 0;
+	while (i < sim.number_of_coders)
+	{
+		sim.coders[i].last_compile_start = sim.simulation_start_time;
+		i++;
+	}
 
 	if (!start_coder_threads(&sim))
 	{

@@ -86,7 +86,6 @@ void *runtime_coder_routine(void *arg)
 	coder->compiles_done = 0;
 	while (!sim->stop && coder->compiles_done < sim->number_of_compiles_required)
 	{
-		coder->last_compile_start = get_timestamp_ms();
 		if (!acquire_dongle(coder, first))
 			break;
 
@@ -106,6 +105,7 @@ void *runtime_coder_routine(void *arg)
 
 		if (!sim->stop)
 		{
+			coder->last_compile_start = get_timestamp_ms();
 			print_coder_state(coder, "is compiling");
 			sleep_ms(sim->time_to_compile, sim);
 		}
