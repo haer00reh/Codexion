@@ -103,6 +103,7 @@ void *burn_out_monitor(void *arg)
 			pthread_mutex_lock(&sim->stop_mutex);
 			sim->stop = true;
 			pthread_mutex_unlock(&sim->stop_mutex);
+			break;
 		}
 		usleep(100);
 	}
