@@ -70,6 +70,8 @@ void *runtime_coder_routine(void *arg)
 	t_simulation	*sim;
 	t_dongle		*first;
 	t_dongle		*second;
+	bool			has_first;
+	bool			has_second;
 
 	coder = (t_coder *)arg;
 	sim = coder->sim;
@@ -96,8 +98,11 @@ void *runtime_coder_routine(void *arg)
 
 	while (!sim->stop && coder->compiles_done < sim->number_of_compiles_required)
 	{
+		has_first = false;
+		has_second = false;
 		if (!acquire_dongle(coder, first))
 			break;
+		has_first = true;
 
 		if (!sim->stop)
 			print_coder_state(coder, "has taken a dongle");
@@ -106,22 +111,27 @@ void *runtime_coder_routine(void *arg)
 		{
 			if (!acquire_dongle(coder, second))
 			{
-				release_dongle(coder, first);
+				if (has_first)
+					release_dongle(coder, first);
 				break;
 			}
+			has_second = true;
 			if (!sim->stop)
 				print_coder_state(coder, "has taken a dongle");
 		}
+		else
+			has_second = true;
 
-		if (!sim->stop)
+		if (!sim->stop && has_first && has_second)
 		{
 			coder->last_compile_start = get_timestamp_ms();
 			print_coder_state(coder, "is compiling");
 			sleep_ms(sim->time_to_compile, sim);
 		}
 
-		release_dongle(coder, first);
-		if (second != first)
+		if (has_first)
+			release_dongle(coder, first);
+		if (second != first && has_second)
 			release_dongle(coder, second);
 
 		if (!sim->stop)
