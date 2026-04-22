@@ -142,7 +142,7 @@ bool acquire_dongle(t_coder *coder, t_dongle *dongle)
 		}
 		pthread_mutex_unlock(&coder->sim->stop_mutex);
 
-		if (can_take_dongle(coder, dongle))
+		if (can_take_dongle(coder, dongle) && dongle->in_use == false)
 		{
 			dongle->in_use = true;
 			heap_pop_min(&dongle->waiting_heap);

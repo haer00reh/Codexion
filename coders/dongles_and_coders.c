@@ -85,12 +85,12 @@ void *runtime_coder_routine(void *arg)
 	}
 	coder->compiles_done = 0;
 
-		if (sim->number_of_coders)
+		if (sim->number_of_coders == 1)
 		{
 			if (!acquire_dongle(coder, first))
 				return (NULL);
-		if (!sim->stop)
-			print_coder_state(coder, "has taken a dongle");
+			if (!sim->stop)
+				print_coder_state(coder, "has taken a dongle");
 		return (NULL);
 		}
 
