@@ -104,16 +104,28 @@ void *runtime_coder_routine(void *arg)
 		return (NULL);
 		}
 
-	while (!sim->stop && coder->compiles_done < sim->number_of_compiles_required)
+	while (coder->compiles_done < sim->number_of_compiles_required)
 	{
+		pthread_mutex_lock(&sim->stop_mutex);
+		if (sim->stop)
+		{
+			pthread_mutex_unlock(&sim->stop_mutex);
+			break ;
+		}
+		pthread_mutex_unlock(&sim->stop_mutex);
+
 		has_first = false;
 		has_second = false;
 		if (!acquire_dongle(coder, first))
 			break;
 		has_first = true;
 		
+		pthread_mutex_lock(&sim->stop_mutex);
 		if (!sim->stop)
+		{
+			pthread_mutex_unlock(&sim->stop_mutex);
 			print_coder_state(coder, "has taken a dongle");
+		}
 
 		if (second != first)
 		{
@@ -125,20 +137,31 @@ void *runtime_coder_routine(void *arg)
 			}
 			has_second = true;
 
-			if (!sim->stop)
-				print_coder_state(coder, "has taken a dongle");
+		pthread_mutex_lock(&sim->stop_mutex);
+		if (!sim->stop)
+		{
+			pthread_mutex_unlock(&sim->stop_mutex);
+			print_coder_state(coder, "has taken a dongle");
+		}
 
 		}
 		else
 			has_second = true;
 
+		pthread_mutex_lock(&sim->stop_mutex);
 		if (!sim->stop && has_first && has_second)
 		{
+			pthread_mutex_unlock(&sim->stop_mutex);
 			pthread_mutex_lock(&sim->read_write_mutex);
 			coder->last_compile_start = get_timestamp_ms();
 			pthread_mutex_unlock(&sim->read_write_mutex);
+		pthread_mutex_lock(&sim->stop_mutex);
+		if (!sim->stop)
+		{
+			pthread_mutex_unlock(&sim->stop_mutex);
 			print_coder_state(coder, "is compiling");
 			sleep_ms(sim->time_to_compile, sim);
+		}
 		}
 
 		if (has_first)
@@ -146,16 +169,20 @@ void *runtime_coder_routine(void *arg)
 		if (second != first && has_second)
 			release_dongle(coder, second);
 
+		pthread_mutex_lock(&sim->stop_mutex);
 		if (!sim->stop)
 		{
+			pthread_mutex_unlock(&sim->stop_mutex);
 			print_coder_state(coder, "is debugging");
 			sleep_ms(sim->time_to_debug, sim);
 		}
 
+		pthread_mutex_lock(&sim->stop_mutex);
 		if (!sim->stop)
 		{
-		print_coder_state(coder, "is refactoring");
-		sleep_ms(sim->time_to_refactor, sim);
+			pthread_mutex_unlock(&sim->stop_mutex);
+			print_coder_state(coder, "is refactoring");
+			sleep_ms(sim->time_to_refactor, sim);
 		}
 		pthread_mutex_lock(&sim->read_write_mutex);
 		coder->compiles_done++;
