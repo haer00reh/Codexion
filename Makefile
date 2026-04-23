@@ -1,6 +1,6 @@
 NAME = codexion
-CFLAGS = -Wall -Wextra -Werror
-CC = cc
+CFLAGS = -g -Wall -Wextra -Werror -pthread -fsanitize=thread
+CC = clang
 
 FILES = coders/dongles_and_coders.c coders/heap.c coders/main.c coders/parse_tools.c coders/utilities.c
 # coders/dongles_and_coders.c  coders/heap.c  coders/main.c  coders/parse_tools.c  coders/utilities.c
@@ -9,10 +9,8 @@ OBJ = $(FILES:.c=.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(OBJ) -o $(NAME)
+	$(CC) $(OBJ) -fsanitize=thread -fno-PIE -no-pie -o $(NAME)
 
-$(B_NAME): $(B_OBJ)
-	$(CC) $(B_OBJ) -o $(B_NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

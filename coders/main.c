@@ -71,6 +71,7 @@ void *burn_out_monitor(void *arg)
 		while (i < sim->number_of_coders)
 		{
 			current_time = get_timestamp_ms();
+			pthread_mutex_lock(&sim->read_write_mutex);
 			if (sim->time_to_burnout > 0 &&
 			 current_time - sim->coders[i].last_compile_start >= sim->time_to_burnout)
 			{
@@ -91,13 +92,17 @@ void *burn_out_monitor(void *arg)
 				}
 				return (NULL);
 			}
+			pthread_mutex_unlock(&sim->read_write_mutex);
 			i++;
 		}
+		pthread_mutex_lock(&sim->counter_mutex);
 		for (i = 0; i < sim->number_of_coders; i++)
 		{
 			if (sim->coders[i].compiles_done < sim->number_of_compiles_required)
 				break;
 		}
+		pthread_mutex_unlock(&sim->counter_mutex);
+
 		if (i == sim->number_of_coders)
 		{
 			pthread_mutex_lock(&sim->stop_mutex);

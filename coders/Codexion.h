@@ -70,6 +70,7 @@ typedef struct s_simulation
 	pthread_mutex_t		print_mutex;
 	pthread_mutex_t	stop_mutex;
 	pthread_mutex_t	counter_mutex;
+	pthread_mutex_t read_write_mutex;
 	long			global_sequence;
 
 	long	number_of_coders;

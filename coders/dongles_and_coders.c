@@ -42,8 +42,15 @@ static void	sleep_ms(long ms, t_simulation *sim)
 	start = get_timestamp_ms();
 	while (get_timestamp_ms() - start < ms)
 	{
+		pthread_mutex_lock(&sim->stop_mutex);
+
 		if (sim->stop)
+		{
+			pthread_mutex_unlock(&sim->stop_mutex);
 			break;
+		}
+		pthread_mutex_unlock(&sim->stop_mutex);
+
 		usleep(100);
 	}
 }
@@ -93,6 +100,7 @@ void *runtime_coder_routine(void *arg)
 				return (NULL);
 			if (!sim->stop)
 				print_coder_state(coder, "has taken a dongle");
+
 		return (NULL);
 		}
 
@@ -103,7 +111,7 @@ void *runtime_coder_routine(void *arg)
 		if (!acquire_dongle(coder, first))
 			break;
 		has_first = true;
-
+		
 		if (!sim->stop)
 			print_coder_state(coder, "has taken a dongle");
 
@@ -116,15 +124,19 @@ void *runtime_coder_routine(void *arg)
 				break;
 			}
 			has_second = true;
+
 			if (!sim->stop)
 				print_coder_state(coder, "has taken a dongle");
+
 		}
 		else
 			has_second = true;
 
 		if (!sim->stop && has_first && has_second)
 		{
+			pthread_mutex_lock(&sim->read_write_mutex);
 			coder->last_compile_start = get_timestamp_ms();
+			pthread_mutex_unlock(&sim->read_write_mutex);
 			print_coder_state(coder, "is compiling");
 			sleep_ms(sim->time_to_compile, sim);
 		}
