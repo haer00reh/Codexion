@@ -62,6 +62,9 @@ void *burn_out_monitor(void *arg)
 {
 	t_simulation	*sim;
 	long			current_time;
+	long			last_compile_start;
+	int			coder_id;
+	bool			burned_out;
 	int				i;
 
 	sim = (t_simulation *)arg;
@@ -71,12 +74,18 @@ void *burn_out_monitor(void *arg)
 		while (i < sim->number_of_coders)
 		{
 			current_time = get_timestamp_ms();
-			pthread_mutex_lock(&sim->read_write_mutex);
-			if (sim->time_to_burnout > 0 &&
-			 current_time - sim->coders[i].last_compile_start >= sim->time_to_burnout)
+			pthread_mutex_lock(&sim->counter_mutex);
+			last_compile_start = sim->coders[i].last_compile_start;
+			coder_id = sim->coders[i].id;
+			burned_out = (sim->time_to_burnout > 0
+					&& current_time - last_compile_start >= sim->time_to_burnout);
+			pthread_mutex_unlock(&sim->counter_mutex);
+			if (burned_out)
 			{
 				pthread_mutex_lock(&sim->print_mutex);
-				printf("%ld %d is burned out\n", current_time - sim->simulation_start_time, sim->coders[i].id);
+				printf("%ld %d is burned out\n",
+					current_time - sim->simulation_start_time,
+					coder_id);
 				pthread_mutex_lock(&sim->stop_mutex);
 				sim->stop = true;
 				pthread_mutex_unlock(&sim->stop_mutex);
@@ -92,17 +101,14 @@ void *burn_out_monitor(void *arg)
 				}
 				return (NULL);
 			}
-			pthread_mutex_unlock(&sim->read_write_mutex);
 			i++;
 		}
 		pthread_mutex_lock(&sim->counter_mutex);
-		pthread_mutex_lock(&sim->read_write_mutex);
 		for (i = 0; i < sim->number_of_coders; i++)
 		{
 			if (sim->coders[i].compiles_done < sim->number_of_compiles_required)
 				break;
 		}
-		pthread_mutex_unlock(&sim->read_write_mutex);
 		pthread_mutex_unlock(&sim->counter_mutex);
 
 		if (i == sim->number_of_coders)
