@@ -121,7 +121,7 @@ void *runtime_coder_routine(void *arg)
 			{
 				if (has_first)
 					release_dongle(coder, first);
-				break;
+				break ;
 			}
 			has_second = true;
 
@@ -152,10 +152,14 @@ void *runtime_coder_routine(void *arg)
 			sleep_ms(sim->time_to_debug, sim);
 		}
 
+		if (!sim->stop)
+		{
 		print_coder_state(coder, "is refactoring");
 		sleep_ms(sim->time_to_refactor, sim);
+		}
+		pthread_mutex_lock(&sim->read_write_mutex);
 		coder->compiles_done++;
-
+		pthread_mutex_unlock(&sim->read_write_mutex);
 	}
 
 	return (NULL);

@@ -96,11 +96,13 @@ void *burn_out_monitor(void *arg)
 			i++;
 		}
 		pthread_mutex_lock(&sim->counter_mutex);
+		pthread_mutex_lock(&sim->read_write_mutex);
 		for (i = 0; i < sim->number_of_coders; i++)
 		{
 			if (sim->coders[i].compiles_done < sim->number_of_compiles_required)
 				break;
 		}
+		pthread_mutex_unlock(&sim->read_write_mutex);
 		pthread_mutex_unlock(&sim->counter_mutex);
 
 		if (i == sim->number_of_coders)

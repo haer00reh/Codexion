@@ -1,5 +1,5 @@
 NAME = codexion
-CFLAGS = -g -Wall -Wextra -Werror -pthread -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
 CC = clang
 
 FILES = coders/dongles_and_coders.c coders/heap.c coders/main.c coders/parse_tools.c coders/utilities.c
