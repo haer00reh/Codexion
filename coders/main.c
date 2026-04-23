@@ -38,7 +38,6 @@ static void	wait_dongle_until_ready(t_dongle *dongle)
 	}
 }
 
-
 static bool	start_coder_threads(t_simulation *sim)
 {
 	int	i;
@@ -46,8 +45,8 @@ static bool	start_coder_threads(t_simulation *sim)
 	i = 0;
 	while (i < sim->number_of_coders)
 	{
-		if (pthread_create(&sim->coders[i].thread, NULL,
-				runtime_coder_routine, &sim->coders[i]) != 0)
+		if (pthread_create(&sim->coders[i].thread, NULL, runtime_coder_routine,
+				&sim->coders[i]) != 0)
 		{
 			while (--i >= 0)
 				pthread_join(sim->coders[i].thread, NULL);
@@ -58,12 +57,12 @@ static bool	start_coder_threads(t_simulation *sim)
 	return (true);
 }
 
-void *burn_out_monitor(void *arg)
+void	*burn_out_monitor(void *arg)
 {
 	t_simulation	*sim;
 	long			current_time;
 	long			last_compile_start;
-	int			coder_id;
+	int				coder_id;
 	bool			burned_out;
 	int				i;
 
@@ -77,20 +76,18 @@ void *burn_out_monitor(void *arg)
 			pthread_mutex_lock(&sim->counter_mutex);
 			last_compile_start = sim->coders[i].last_compile_start;
 			coder_id = sim->coders[i].id;
-			burned_out = (sim->time_to_burnout > 0
-					&& current_time - last_compile_start >= sim->time_to_burnout);
+			burned_out = (sim->time_to_burnout > 0 && current_time
+					- last_compile_start >= sim->time_to_burnout);
 			pthread_mutex_unlock(&sim->counter_mutex);
 			if (burned_out)
 			{
 				pthread_mutex_lock(&sim->print_mutex);
-				printf("%ld %d is burned out\n",
-					current_time - sim->simulation_start_time,
-					coder_id);
+				printf("%ld %d is burned out\n", current_time
+					- sim->simulation_start_time, coder_id);
 				pthread_mutex_lock(&sim->stop_mutex);
 				sim->stop = true;
 				pthread_mutex_unlock(&sim->stop_mutex);
 				pthread_mutex_unlock(&sim->print_mutex);
-
 				i = 0;
 				while (i < sim->number_of_coders)
 				{
@@ -107,23 +104,22 @@ void *burn_out_monitor(void *arg)
 		for (i = 0; i < sim->number_of_coders; i++)
 		{
 			if (sim->coders[i].compiles_done < sim->number_of_compiles_required)
-				break;
+				break ;
 		}
 		pthread_mutex_unlock(&sim->counter_mutex);
-
 		if (i == sim->number_of_coders)
 		{
 			pthread_mutex_lock(&sim->stop_mutex);
 			sim->stop = true;
 			pthread_mutex_unlock(&sim->stop_mutex);
-			break;
+			break ;
 		}
 		usleep(10);
 	}
 	return (NULL);
 }
 
-void start_monitor_thread(t_simulation *sim)
+void	start_monitor_thread(t_simulation *sim)
 {
 	pthread_create(&sim->monitor_thread, NULL, burn_out_monitor, sim);
 }
@@ -140,7 +136,7 @@ static void	join_coder_threads(t_simulation *sim)
 	}
 }
 
-bool acquire_dongle(t_coder *coder, t_dongle *dongle)
+bool	acquire_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->mutex);
 	request_submission(coder->sim, coder, dongle);
@@ -154,7 +150,6 @@ bool acquire_dongle(t_coder *coder, t_dongle *dongle)
 			return (false);
 		}
 		pthread_mutex_unlock(&coder->sim->stop_mutex);
-
 		if (can_take_dongle(coder, dongle) && dongle->in_use == false)
 		{
 			dongle->in_use = true;
@@ -166,7 +161,7 @@ bool acquire_dongle(t_coder *coder, t_dongle *dongle)
 	}
 }
 
-bool can_take_dongle(t_coder *coder, t_dongle *dongle)
+bool	can_take_dongle(t_coder *coder, t_dongle *dongle)
 {
 	if (dongle->waiting_heap.size == 0)
 		return (false);
@@ -179,7 +174,7 @@ bool can_take_dongle(t_coder *coder, t_dongle *dongle)
 	return (true);
 }
 
-void release_dongle(t_coder *coder, t_dongle *dongle)
+void	release_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->mutex);
 	dongle->in_use = false;
@@ -188,19 +183,17 @@ void release_dongle(t_coder *coder, t_dongle *dongle)
 	pthread_mutex_unlock(&dongle->mutex);
 }
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
 	t_simulation	sim;
-	int			i;
+	int				i;
 
 	(void)ac;
 	memset(&sim, 0, sizeof(sim));
-
 	if (!(arg_checker(av)))
 		return (-1);
 	if (!init_simulation_from_args(&sim, av))
 		return (-1);
-
 	sim.simulation_start_time = get_timestamp_ms();
 	i = 0;
 	while (i < sim.number_of_coders)
@@ -208,18 +201,14 @@ int main(int ac, char **av)
 		sim.coders[i].last_compile_start = sim.simulation_start_time;
 		i++;
 	}
-
 	if (!start_coder_threads(&sim))
 	{
 		destroy_simulation_runtime(&sim);
 		return (-1);
 	}
-
 	start_monitor_thread(&sim);
-
 	join_coder_threads(&sim);
 	pthread_join(sim.monitor_thread, NULL);
-
 	destroy_simulation_runtime(&sim);
 	return (0);
 }

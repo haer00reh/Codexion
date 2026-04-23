@@ -1,17 +1,18 @@
 #include "Codexion.h"
 
-
 bool	arg_to_long(char *str, long *ret)
 {
 	*ret = ft_atol(str);
-
 	if (*ret < 0)
 	{
-		fprintf(stderr, "Error occured while checking, found a negative number\nPlease provide a positive number\n\nquitting...\n");
-		return false;
+		fprintf(stderr,
+				"Error occured while checking, "
+				"found a negative number\nPlease provide a positive"
+				" number\n\nquitting...\n");
+		return (false);
 	}
 	else
-	return true;
+		return (true);
 }
 
 void	destroy_simulation_runtime(t_simulation *sim)
@@ -21,9 +22,9 @@ void	destroy_simulation_runtime(t_simulation *sim)
 	pthread_mutex_destroy(&sim->counter_mutex);
 }
 
-bool init_dongles(t_simulation *sim)
+bool	init_dongles(t_simulation *sim)
 {
-	int i;
+	int	i;
 
 	sim->dongles = malloc(sizeof(t_dongle) * sim->number_of_coders);
 	if (!sim->dongles)
@@ -32,7 +33,6 @@ bool init_dongles(t_simulation *sim)
 		return (false);
 	}
 	i = 0;
-
 	while (i < sim->number_of_coders)
 	{
 		// risky cleanup block
@@ -59,17 +59,17 @@ bool init_dongles(t_simulation *sim)
 	return (true);
 }
 
-long get_timestamp_ms(void)
+long	get_timestamp_ms(void)
 {
-	struct timeval tv;
+	struct timeval	tv;
+
 	gettimeofday(&tv, NULL);
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-
-bool init_coder(t_simulation *sim)
+bool	init_coder(t_simulation *sim)
 {
-	int i;
+	int	i;
 
 	sim->coders = malloc(sizeof(t_coder) * sim->number_of_coders);
 	if (!sim->coders)
@@ -82,13 +82,13 @@ bool init_coder(t_simulation *sim)
 		sim->coders[i].last_compile_start = 0;
 		sim->coders[i].compiles_done = 0;
 		sim->coders[i].left_dongle = &sim->dongles[i];
-		sim->coders[i].right_dongle = &sim->dongles[(i + 1) % sim->number_of_coders];
+		sim->coders[i].right_dongle = &sim->dongles[(i + 1)
+			% sim->number_of_coders];
 		sim->coders[i].sim = sim;
 		i++;
 	}
 	return (true);
 }
-
 
 bool	init_simulation_from_args(t_simulation *sim, char **av)
 {
@@ -100,7 +100,6 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 	sim->simulation_start_time = 0;
 	sim->stop = false;
 	sim->global_sequence = 0;
-	
 	ret = pthread_mutex_init(&sim->print_mutex, NULL);
 	if (ret != 0)
 		return (false);
@@ -141,14 +140,12 @@ bool	init_simulation_from_args(t_simulation *sim, char **av)
 		sim->scheduler = EDF;
 	else
 		return (destroy_simulation_runtime(sim), false);
-
 	return (true);
 }
 
-
 long	ft_atol(char *str)
 {
-	long (sign), (nbr);
+	long(sign), (nbr);
 	sign = 1;
 	nbr = 0;
 	while (*str == ' ' || (*str >= 9 && *str <= 13))
@@ -160,15 +157,14 @@ long	ft_atol(char *str)
 		str++;
 	}
 	if (*str < '0' || *str > '9')
-		return 0;
+		return (0);
 	while (*str)
 	{
 		if (*str < '0' || *str > '9')
-			return 0;
+			return (0);
 		nbr = (nbr * 10) + (*str - '0');
-		if ((sign == 1 && nbr > 2147483647)
-			|| (sign == -1 && nbr > 2147483648))
-			return 0;
+		if ((sign == 1 && nbr > 2147483647) || (sign == -1 && nbr > 2147483648))
+			return (0);
 		str++;
 	}
 	return (nbr * sign);

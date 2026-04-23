@@ -35,7 +35,7 @@ void	heapify_up(t_heap *heap, int child)
 	}
 }
 
-bool request_less(t_request a, t_request b)
+bool	request_less(t_request a, t_request b)
 {
 	if (a.priority < b.priority)
 		return (true);
@@ -55,11 +55,11 @@ void	heapify_down(t_heap *heap, int child)
 		left = child * 2 + 1;
 		right = child * 2 + 2;
 		smallest = child;
-		if (left < heap->size
-			&& request_less(heap->arr[left], heap->arr[smallest]))
+		if (left < heap->size && request_less(heap->arr[left],
+				heap->arr[smallest]))
 			smallest = left;
-		if (right < heap->size
-			&& request_less(heap->arr[right], heap->arr[smallest]))
+		if (right < heap->size && request_less(heap->arr[right],
+				heap->arr[smallest]))
 			smallest = right;
 		if (smallest == child)
 			break ;
@@ -109,7 +109,6 @@ bool	heap_pop_min(t_heap *heap)
 }
 
 // debugging
-
 
 // int	main(void)
 // {

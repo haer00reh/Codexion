@@ -27,22 +27,17 @@ void	print_coder_state(t_coder *coder, const char *state)
 	long	timestamp;
 
 	pthread_mutex_lock(&coder->sim->print_mutex);
-
 	pthread_mutex_lock(&coder->sim->stop_mutex);
 	if (coder->sim->stop)
 	{
 		pthread_mutex_unlock(&coder->sim->stop_mutex);
 		pthread_mutex_unlock(&coder->sim->print_mutex);
-		return;
+		return ;
 	}
 	pthread_mutex_unlock(&coder->sim->stop_mutex);
-
 	timestamp = get_timestamp_ms();
-	printf("%ld %d %s\n",
-		timestamp - coder->sim->simulation_start_time,
-		coder->id,
-		state);
-
+	printf("%ld %d %s\n", timestamp - coder->sim->simulation_start_time,
+		coder->id, state);
 	pthread_mutex_unlock(&coder->sim->print_mutex);
 }
 
@@ -59,9 +54,9 @@ static void	sleep_ms(long ms, t_simulation *sim)
 	}
 }
 
-void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
+void	request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
 {
-	long priority;
+	long	priority;
 
 	pthread_mutex_lock(&sim->counter_mutex);
 	if (sim->scheduler == FIFO)
@@ -72,9 +67,7 @@ void request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
 	pthread_mutex_unlock(&sim->counter_mutex);
 }
 
-
-
-void *runtime_coder_routine(void *arg)
+void	*runtime_coder_routine(void *arg)
 {
 	t_coder			*coder;
 	t_simulation	*sim;
@@ -96,37 +89,32 @@ void *runtime_coder_routine(void *arg)
 		second = coder->left_dongle;
 	}
 	coder->compiles_done = 0;
-
-		if (sim->number_of_coders == 1)
-		{
-			if (!acquire_dongle(coder, first))
-				return (NULL);
-			if (!simulation_stopped(sim))
-				print_coder_state(coder, "has taken a dongle");
-		return (NULL);
-		}
-
-		while (1)
+	if (sim->number_of_coders == 1)
 	{
-			pthread_mutex_lock(&sim->counter_mutex);
-			if (coder->compiles_done >= sim->number_of_compiles_required)
-			{
-				pthread_mutex_unlock(&sim->counter_mutex);
-				break ;
-			}
+		if (!acquire_dongle(coder, first))
+			return (NULL);
+		if (!simulation_stopped(sim))
+			print_coder_state(coder, "has taken a dongle");
+		return (NULL);
+	}
+	while (1)
+	{
+		pthread_mutex_lock(&sim->counter_mutex);
+		if (coder->compiles_done >= sim->number_of_compiles_required)
+		{
 			pthread_mutex_unlock(&sim->counter_mutex);
-			if (simulation_stopped(sim))
-				break ;
-
+			break ;
+		}
+		pthread_mutex_unlock(&sim->counter_mutex);
+		if (simulation_stopped(sim))
+			break ;
 		has_first = false;
 		has_second = false;
 		if (!acquire_dongle(coder, first))
-			break;
+			break ;
 		has_first = true;
-
 		if (!simulation_stopped(sim))
 			print_coder_state(coder, "has taken a dongle");
-
 		if (second != first)
 		{
 			if (!acquire_dongle(coder, second))
@@ -137,11 +125,10 @@ void *runtime_coder_routine(void *arg)
 			}
 			has_second = true;
 			if (!simulation_stopped(sim))
-			print_coder_state(coder, "has taken a dongle");
+				print_coder_state(coder, "has taken a dongle");
 		}
 		else
 			has_second = true;
-
 		if (!simulation_stopped(sim) && has_first && has_second)
 		{
 			pthread_mutex_lock(&sim->counter_mutex);
@@ -149,22 +136,19 @@ void *runtime_coder_routine(void *arg)
 			pthread_mutex_unlock(&sim->counter_mutex);
 			if (!simulation_stopped(sim))
 			{
-			print_coder_state(coder, "is compiling");
-			sleep_ms(sim->time_to_compile, sim);
+				print_coder_state(coder, "is compiling");
+				sleep_ms(sim->time_to_compile, sim);
 			}
 		}
-
 		if (has_first)
 			release_dongle(coder, first);
 		if (second != first && has_second)
 			release_dongle(coder, second);
-
 		if (!simulation_stopped(sim))
 		{
 			print_coder_state(coder, "is debugging");
 			sleep_ms(sim->time_to_debug, sim);
 		}
-
 		if (!simulation_stopped(sim))
 		{
 			print_coder_state(coder, "is refactoring");
@@ -174,6 +158,5 @@ void *runtime_coder_routine(void *arg)
 		coder->compiles_done++;
 		pthread_mutex_unlock(&sim->counter_mutex);
 	}
-
 	return (NULL);
 }
