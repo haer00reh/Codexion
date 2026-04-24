@@ -54,7 +54,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex;
 	pthread_cond_t		cond;
-	t_heap				waiting_heap;
+	t_heap				*waiting_heap;
 	bool				in_use;
 	long				available_at;
 	int					id;

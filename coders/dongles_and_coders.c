@@ -63,7 +63,7 @@ void	request_submission(t_simulation *sim, t_coder *coder, t_dongle *dongle)
 		priority = 0;
 	else
 		priority = coder->last_compile_start + sim->time_to_burnout;
-	heap_push(&dongle->waiting_heap, coder, priority, sim->global_sequence++);
+	heap_push(dongle->waiting_heap, coder, priority, sim->global_sequence++);
 	pthread_mutex_unlock(&sim->counter_mutex);
 }
 

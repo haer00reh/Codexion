@@ -35,12 +35,17 @@ bool	init_dongles(t_simulation *sim)
 	i = 0;
 	while (i < sim->number_of_coders)
 	{
-		// risky cleanup block
-		if (!heap_init(&sim->dongles[i].waiting_heap, sim->number_of_coders))
+		sim->dongles[i].waiting_heap = malloc(sizeof(t_heap));
+		if (!sim->dongles[i].waiting_heap
+			|| !heap_init(sim->dongles[i].waiting_heap, sim->number_of_coders))
 		{
+			free(sim->dongles[i].waiting_heap);
+			sim->dongles[i].waiting_heap = NULL;
 			while (i > 0)
 			{
-				heap_destroy(&sim->dongles[i - 1].waiting_heap);
+				heap_destroy(sim->dongles[i - 1].waiting_heap);
+				free(sim->dongles[i - 1].waiting_heap);
+				sim->dongles[i - 1].waiting_heap = NULL;
 				pthread_mutex_destroy(&sim->dongles[i - 1].mutex);
 				pthread_cond_destroy(&sim->dongles[i - 1].cond);
 				i--;
