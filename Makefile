@@ -2,8 +2,11 @@ NAME = codexion
 CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
 CC = clang
 
-FILES = coders/dongles_and_coders.c coders/heap.c coders/main.c coders/parse_tools.c coders/utilities.c
-# coders/dongles_and_coders.c  coders/heap.c  coders/main.c  coders/parse_tools.c  coders/utilities.c
+FILES = coders/coder_cycle.c coders/coder_routine.c coders/dongle_access.c \
+	coders/dongles_and_coders.c \
+	coders/heap.c coders/heap_utils.c coders/main.c coders/monitor.c \
+	coders/parse_tools.c coders/simulation_entities.c coders/simulation_init.c \
+	coders/utilities.c
 
 OBJ = $(FILES:.c=.o)
 all: $(NAME)

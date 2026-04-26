@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_tools.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/01 17:30:11 by haer-reh          #+#    #+#             */
+/*   Updated: 2026/04/26 10:00:00 by haer-reh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Codexion.h"
 
 bool	arg_to_long(char *str, long *ret)
@@ -6,60 +18,9 @@ bool	arg_to_long(char *str, long *ret)
 	if (*ret < 0)
 	{
 		fprintf(stderr,
-				"Error occured while checking, "
-				"found a negative number\nPlease provide a positive"
-				" number\n\nquitting...\n");
+			"Error occured while checking, found a negative number\n"
+			"Please provide a positive number\n\nquitting...\n");
 		return (false);
-	}
-	else
-		return (true);
-}
-
-void	destroy_simulation_runtime(t_simulation *sim)
-{
-	pthread_mutex_destroy(&sim->print_mutex);
-	pthread_mutex_destroy(&sim->stop_mutex);
-	pthread_mutex_destroy(&sim->counter_mutex);
-}
-
-bool	init_dongles(t_simulation *sim)
-{
-	int	i;
-
-	sim->dongles = malloc(sizeof(t_dongle) * sim->number_of_coders);
-	if (!sim->dongles)
-	{
-		free(sim->coders);
-		return (false);
-	}
-	i = 0;
-	while (i < sim->number_of_coders)
-	{
-		sim->dongles[i].waiting_heap = malloc(sizeof(t_heap));
-		if (!sim->dongles[i].waiting_heap
-			|| !heap_init(sim->dongles[i].waiting_heap, sim->number_of_coders))
-		{
-			free(sim->dongles[i].waiting_heap);
-			sim->dongles[i].waiting_heap = NULL;
-			while (i > 0)
-			{
-				heap_destroy(sim->dongles[i - 1].waiting_heap);
-				free(sim->dongles[i - 1].waiting_heap);
-				sim->dongles[i - 1].waiting_heap = NULL;
-				pthread_mutex_destroy(&sim->dongles[i - 1].mutex);
-				pthread_cond_destroy(&sim->dongles[i - 1].cond);
-				i--;
-			}
-			free(sim->dongles);
-			free(sim->coders);
-			return (false);
-		}
-		sim->dongles[i].id = i + 1;
-		sim->dongles[i].in_use = false;
-		sim->dongles[i].available_at = 0;
-		pthread_mutex_init(&sim->dongles[i].mutex, NULL);
-		pthread_cond_init(&sim->dongles[i].cond, NULL);
-		i++;
 	}
 	return (true);
 }
@@ -72,85 +33,11 @@ long	get_timestamp_ms(void)
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-bool	init_coder(t_simulation *sim)
-{
-	int	i;
-
-	sim->coders = malloc(sizeof(t_coder) * sim->number_of_coders);
-	if (!sim->coders)
-		return (false);
-	i = 0;
-	while (i < sim->number_of_coders)
-	{
-		sim->coders[i].id = i + 1;
-		sim->coders[i].thread = 0;
-		sim->coders[i].last_compile_start = 0;
-		sim->coders[i].compiles_done = 0;
-		sim->coders[i].left_dongle = &sim->dongles[i];
-		sim->coders[i].right_dongle = &sim->dongles[(i + 1)
-			% sim->number_of_coders];
-		sim->coders[i].sim = sim;
-		i++;
-	}
-	return (true);
-}
-
-bool	init_simulation_from_args(t_simulation *sim, char **av)
-{
-	int	ret;
-
-	sim->coders = NULL;
-	sim->dongles = NULL;
-	sim->monitor_thread = 0;
-	sim->simulation_start_time = 0;
-	sim->stop = false;
-	sim->global_sequence = 0;
-	ret = pthread_mutex_init(&sim->print_mutex, NULL);
-	if (ret != 0)
-		return (false);
-	ret = pthread_mutex_init(&sim->stop_mutex, NULL);
-	if (ret != 0)
-	{
-		pthread_mutex_destroy(&sim->print_mutex);
-		return (false);
-	}
-	ret = pthread_mutex_init(&sim->counter_mutex, NULL);
-	if (ret != 0)
-	{
-		pthread_mutex_destroy(&sim->print_mutex);
-		pthread_mutex_destroy(&sim->stop_mutex);
-		return (false);
-	}
-	if (!arg_to_long(av[1], &sim->number_of_coders))
-		return (destroy_simulation_runtime(sim), false);
-	if (!arg_to_long(av[2], &sim->number_of_compiles_required))
-		return (destroy_simulation_runtime(sim), false);
-	if (!arg_to_long(av[3], &sim->time_to_burnout))
-		return (destroy_simulation_runtime(sim), false);
-	if (!arg_to_long(av[4], &sim->time_to_compile))
-		return (destroy_simulation_runtime(sim), false);
-	if (!arg_to_long(av[5], &sim->time_to_debug))
-		return (destroy_simulation_runtime(sim), false);
-	if (!arg_to_long(av[6], &sim->time_to_refactor))
-		return (destroy_simulation_runtime(sim), false);
-	if (!arg_to_long(av[7], &sim->dongle_cooldown))
-		return (destroy_simulation_runtime(sim), false);
-	if (!init_dongles(sim))
-		return (destroy_simulation_runtime(sim), false);
-	if (!init_coder(sim))
-		return (destroy_simulation_runtime(sim), false);
-	if (strcmp(av[8], "fifo") == 0)
-		sim->scheduler = FIFO;
-	else if (strcmp(av[8], "edf") == 0)
-		sim->scheduler = EDF;
-	else
-		return (destroy_simulation_runtime(sim), false);
-	return (true);
-}
-
 long	ft_atol(char *str)
 {
-	long(sign), (nbr);
+	long	sign;
+	long	nbr;
+
 	sign = 1;
 	nbr = 0;
 	while (*str == ' ' || (*str >= 9 && *str <= 13))

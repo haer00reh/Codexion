@@ -12,6 +12,16 @@
 
 #include "Codexion.h"
 
+static int	count_args(char **args)
+{
+	int	len;
+
+	len = 0;
+	while (args[len])
+		len++;
+	return (len);
+}
+
 bool	str_checker(char *str)
 {
 	int	i;
@@ -22,11 +32,12 @@ bool	str_checker(char *str)
 		if (!(str[i] >= '0' && str[i] <= '9') && str[i] != ' ' && str[i] != '-'
 			&& str[i] != '+')
 		{
+			fprintf(stderr, "Error occured while checking,"
+				"arguments passed are invalid!!\n"
+				"Please give valid arguments\n");
 			fprintf(stderr,
-					"Error occured while checking,"
-					"arguments passed are invalid!!\nPlease give valid arguments\n");
-			fprintf(stderr,
-				"found a non numeric character in one of arguments\n\nquitting...\n");
+				"found a non numeric character in one of arguments\n"
+				"\nquitting...\n");
 			return (false);
 		}
 		i++;
@@ -34,13 +45,27 @@ bool	str_checker(char *str)
 	return (true);
 }
 
+static bool	check_scheduler(char *scheduler)
+{
+	if ((strcmp(scheduler, "fifo") && (strcmp(scheduler, "edf"))))
+	{
+		fprintf(stderr, "error occured when checking for scheduler type\n");
+		fprintf(stderr, "Please provide a valid Scheduler (fifo or edf)\n");
+		fprintf(stderr,
+			"Example:\n./codexion 5 800 200 200 150 7 50 fifo (or edf)\n"
+			"\nquitting...\n");
+		return (false);
+	}
+	return (true);
+}
+
 bool	arg_checker(char **args)
 {
-	int(i), (len);
+	int	i;
+	int	len;
+
 	i = 1;
-	len = 0;
-	while (args[len])
-		len++;
+	len = count_args(args);
 	while (i < len - 1)
 	{
 		if (!str_checker(args[i]))
@@ -50,20 +75,13 @@ bool	arg_checker(char **args)
 	if (len != 9)
 	{
 		fprintf(stderr,
-				"Error occured while checking,"
-				"number of arguments passed is invalid!!\nPlease give valid arguments\n");
+			"Error occured while checking,"
+			"number of arguments passed is invalid!!\n"
+			"Please give valid arguments\n");
 		fprintf(stderr,
-			"Example:\n\n./codexion 5 800 200 200 150 7 50 fifo (or edf)\n\nquitting...\n");
+			"Example:\n\n./codexion 5 800 200 200 150 7 50 fifo (or edf)\n"
+			"\nquitting...\n");
 		return (false);
 	}
-	else if ((strcmp(args[8], "fifo") && (strcmp(args[8], "edf"))))
-	{
-		fprintf(stderr, "error occured when checking for scheduler type\n");
-		fprintf(stderr, "Please provide a valid Scheduler (fifo or edf)\n");
-		fprintf(stderr,
-			"Example:\n./codexion 5 800 200 200 150 7 50 fifo (or edf)\n\nquitting...\n");
-		return (false);
-	}
-	else
-		return (true);
+	return (check_scheduler(args[8]));
 }
