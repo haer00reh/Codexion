@@ -38,15 +38,15 @@ static bool	parse_numeric_values(t_simulation *sim, char **av)
 {
 	if (!arg_to_long(av[1], &sim->number_of_coders))
 		return (false);
-	if (!arg_to_long(av[2], &sim->number_of_compiles_required))
+	if (!arg_to_long(av[2], &sim->time_to_burnout))
 		return (false);
-	if (!arg_to_long(av[3], &sim->time_to_burnout))
+	if (!arg_to_long(av[3], &sim->time_to_compile))
 		return (false);
-	if (!arg_to_long(av[4], &sim->time_to_compile))
+	if (!arg_to_long(av[4], &sim->time_to_debug))
 		return (false);
-	if (!arg_to_long(av[5], &sim->time_to_debug))
+	if (!arg_to_long(av[5], &sim->time_to_refactor))
 		return (false);
-	if (!arg_to_long(av[6], &sim->time_to_refactor))
+	if (!arg_to_long(av[6], &sim->number_of_compiles_required))
 		return (false);
 	if (!arg_to_long(av[7], &sim->dongle_cooldown))
 		return (false);
