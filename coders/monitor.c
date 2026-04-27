@@ -23,7 +23,7 @@ static bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id)
 	pthread_mutex_unlock(&sim->counter_mutex);
 	if (sim->time_to_burnout <= 0)
 		return (false);
-	if (*current - last_compile_start >= sim->time_to_burnout)
+	if (*current - last_compile_start > sim->time_to_burnout)
 		return (true);
 	return (false);
 }
@@ -98,6 +98,6 @@ void	*burn_out_monitor(void *arg)
 			finish_simulation(sim, state, current, coder_id);
 			return (NULL);
 		}
-		usleep(10);
+		usleep(1000);
 	}
 }

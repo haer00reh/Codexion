@@ -1,6 +1,6 @@
 NAME = codexion
 
-CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread -Ofast -flto -march=native
 CC = clang
 
 FILES = coders/coder_cycle.c coders/coder_routine.c coders/dongle_access.c \
@@ -36,7 +36,7 @@ intro:
 
 $(NAME): $(OBJ)
 	@echo "\n$(GREEN)🔗 Linking objects...$(RESET)"
-	@$(CC) $(OBJ) -fsanitize=thread -fno-PIE -no-pie -o $(NAME)
+	@$(CC) $(OBJ) $(CFLAGS) -o $(NAME)
 	@echo "$(GREEN)✅ Build complete: $(NAME)$(RESET)"
 
 %.o: %.c

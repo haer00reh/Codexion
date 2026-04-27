@@ -31,7 +31,7 @@ static void	sleep_ms(long ms, t_simulation *sim)
 	{
 		if (simulation_stopped(sim))
 			break ;
-		usleep(100);
+		usleep(500);
 	}
 }
 
