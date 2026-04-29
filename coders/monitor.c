@@ -28,20 +28,6 @@ static bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id)
 	return (false);
 }
 
-static void	wake_waiting_coders(t_simulation *sim)
-{
-	int	i;
-
-	i = 0;
-	while (i < sim->number_of_coders)
-	{
-		pthread_mutex_lock(&sim->dongles[i].mutex);
-		pthread_cond_broadcast(&sim->dongles[i].cond);
-		pthread_mutex_unlock(&sim->dongles[i].mutex);
-		i++;
-	}
-}
-
 static int	check_simulation_state(t_simulation *sim, long *current,
 		int *coder_id)
 {
@@ -75,7 +61,6 @@ static void	finish_simulation(t_simulation *sim, int state, long current,
 		printf("%ld %d is burned out\n", current - sim->simulation_start_time,
 			coder_id);
 		pthread_mutex_unlock(&sim->print_mutex);
-		wake_waiting_coders(sim);
 	}
 	pthread_mutex_lock(&sim->stop_mutex);
 	sim->stop = true;

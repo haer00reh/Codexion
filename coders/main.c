@@ -57,12 +57,13 @@ static void	init_compile_starts(t_simulation *sim)
 
 static int	run_simulation(t_simulation *sim)
 {
+	
+	pthread_create(&sim->monitor_thread, NULL, burn_out_monitor, sim);
 	if (!start_coder_threads(sim))
 	{
 		destroy_simulation_runtime(sim);
 		return (-1);
 	}
-	pthread_create(&sim->monitor_thread, NULL, burn_out_monitor, sim);
 	join_coder_threads(sim);
 	pthread_join(sim->monitor_thread, NULL);
 	destroy_simulation_runtime(sim);
