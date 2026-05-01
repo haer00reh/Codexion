@@ -68,7 +68,9 @@ void	*runtime_coder_routine(void *arg)
 
 	coder = (t_coder *)arg;
 	set_ordered_dongles(coder, &first, &second);
+	pthread_mutex_lock(&coder->sim->counter_mutex);
 	coder->compiles_done = 0;
+	pthread_mutex_unlock(&coder->sim->counter_mutex);
 	if (coder->sim->number_of_coders == 1)
 	{
 		handle_single_coder(coder, first);
