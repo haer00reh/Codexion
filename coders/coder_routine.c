@@ -6,7 +6,7 @@
 /*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/26 10:00:00 by haer-reh          #+#    #+#             */
-/*   Updated: 2026/05/01 16:07:26 by haer-reh         ###   ########.fr       */
+/*   Updated: 2026/05/01 16:22:44 by haer-reh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ void	*runtime_coder_routine(void *arg)
 	{
 		if (!run_coder_cycle(coder, first, second))
 			break ;
+		if (coder->compiles_done == coder->sim->number_of_compiles_required)
+			coder->has_finished = true;
 	}
 	return (NULL);
 }

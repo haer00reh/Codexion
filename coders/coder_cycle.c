@@ -6,7 +6,7 @@
 /*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/26 10:00:00 by haer-reh          #+#    #+#             */
-/*   Updated: 2026/05/01 16:18:05 by haer-reh         ###   ########.fr       */
+/*   Updated: 2026/05/01 16:22:33 by haer-reh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,5 @@ bool	run_coder_cycle(t_coder *coder, t_dongle *first, t_dongle *second)
 	pthread_mutex_lock(&coder->sim->counter_mutex);
 	coder->compiles_done++;
 	pthread_mutex_unlock(&coder->sim->counter_mutex);
-	if (coder->compiles_done == coder->sim->number_of_compiles_required)
-		coder->has_finished = true;
 	return (true);
 }
