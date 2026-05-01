@@ -79,7 +79,7 @@ int	run_simulation(t_simulation *sim)
 }
 
 int	main(int ac, char **av)
-{
+<%
 	t_simulation	sim;
 
 	(void)ac;
@@ -91,4 +91,4 @@ int	main(int ac, char **av)
 	sim.simulation_start_time = get_timestamp_ms();
 	init_compile_starts(&sim);
 	return (run_simulation(&sim));
-}
+%>
