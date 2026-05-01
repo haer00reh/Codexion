@@ -83,6 +83,6 @@ void	*burn_out_monitor(void *arg)
 			finish_simulation(sim, state, current, coder_id);
 			return (NULL);
 		}
-		usleep(1000);
+		usleep(500);
 	}
 }
