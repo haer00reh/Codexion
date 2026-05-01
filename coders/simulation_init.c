@@ -12,11 +12,35 @@
 
 #include "Codexion.h"
 
+
+bool free_everything(t_simulation *sim)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->number_of_coders)
+	{
+		pthread_mutex_destroy(&sim->dongles[i].mutex);
+		pthread_cond_destroy(&sim->dongles[i].cond);
+		heap_destroy(sim->dongles[i].waiting_heap);
+		free(sim->dongles[i].waiting_heap);
+		sim->dongles[i].waiting_heap = NULL;
+		i++;
+	}
+	free(sim->dongles);
+	sim->dongles = NULL;
+	free(sim->coders);
+	sim->coders = NULL;
+	return (true);
+}
+
 void	destroy_simulation_runtime(t_simulation *sim)
 {
 	pthread_mutex_destroy(&sim->print_mutex);
 	pthread_mutex_destroy(&sim->stop_mutex);
 	pthread_mutex_destroy(&sim->counter_mutex);
+	pthread_mutex_destroy(&sim->read_write_mutex);
+	free_everything(sim);
 }
 
 static bool	init_mutexes(t_simulation *sim)
