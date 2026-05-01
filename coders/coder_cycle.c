@@ -12,7 +12,19 @@
 
 #include "Codexion.h"
 
-static bool	simulation_stopped(t_simulation *sim)
+void	join_coder_threads(t_simulation *sim)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->number_of_coders)
+	{
+		pthread_join(sim->coders[i].thread, NULL);
+		i++;
+	}
+}
+
+bool	simulation_stopped(t_simulation *sim)
 {
 	bool	stopped;
 
@@ -22,7 +34,7 @@ static bool	simulation_stopped(t_simulation *sim)
 	return (stopped);
 }
 
-static void	sleep_ms(long ms, t_simulation *sim)
+void	sleep_ms(long ms, t_simulation *sim)
 {
 	long	start;
 
@@ -35,7 +47,7 @@ static void	sleep_ms(long ms, t_simulation *sim)
 	}
 }
 
-static bool	take_dongles(t_coder *coder, t_dongle *first, t_dongle *second)
+bool	take_dongles(t_coder *coder, t_dongle *first, t_dongle *second)
 {
 	if (!acquire_dongle(coder, first))
 		return (false);

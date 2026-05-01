@@ -12,28 +12,6 @@
 
 #include "Codexion.h"
 
-
-bool free_everything(t_simulation *sim)
-{
-	int	i;
-
-	i = 0;
-	while (i < sim->number_of_coders)
-	{
-		pthread_mutex_destroy(&sim->dongles[i].mutex);
-		pthread_cond_destroy(&sim->dongles[i].cond);
-		heap_destroy(sim->dongles[i].waiting_heap);
-		free(sim->dongles[i].waiting_heap);
-		sim->dongles[i].waiting_heap = NULL;
-		i++;
-	}
-	free(sim->dongles);
-	sim->dongles = NULL;
-	free(sim->coders);
-	sim->coders = NULL;
-	return (true);
-}
-
 void	destroy_simulation_runtime(t_simulation *sim)
 {
 	pthread_mutex_destroy(&sim->print_mutex);
@@ -43,7 +21,7 @@ void	destroy_simulation_runtime(t_simulation *sim)
 	free_everything(sim);
 }
 
-static bool	init_mutexes(t_simulation *sim)
+bool	init_mutexes(t_simulation *sim)
 {
 	if (pthread_mutex_init(&sim->print_mutex, NULL) != 0)
 		return (false);
@@ -58,7 +36,7 @@ static bool	init_mutexes(t_simulation *sim)
 	return (true);
 }
 
-static bool	parse_numeric_values(t_simulation *sim, char **av)
+bool	parse_numeric_values(t_simulation *sim, char **av)
 {
 	if (!arg_to_long(av[1], &sim->number_of_coders))
 		return (false);
@@ -77,7 +55,7 @@ static bool	parse_numeric_values(t_simulation *sim, char **av)
 	return (true);
 }
 
-static bool	set_scheduler(t_simulation *sim, char *scheduler)
+bool	set_scheduler(t_simulation *sim, char *scheduler)
 {
 	if (strcmp(scheduler, "fifo") == 0)
 		sim->scheduler = FIFO;

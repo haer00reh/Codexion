@@ -12,7 +12,7 @@
 
 #include "Codexion.h"
 
-static void	wait_dongle_until_ready(t_dongle *dongle)
+void	wait_dongle_until_ready(t_dongle *dongle)
 {
 	struct timespec	wake_at;
 	long			now;

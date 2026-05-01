@@ -12,7 +12,7 @@
 
 #include "Codexion.h"
 
-static bool	start_coder_threads(t_simulation *sim)
+bool	start_coder_threads(t_simulation *sim)
 {
 	int	i;
 
@@ -31,19 +31,28 @@ static bool	start_coder_threads(t_simulation *sim)
 	return (true);
 }
 
-static void	join_coder_threads(t_simulation *sim)
+bool	free_everything(t_simulation *sim)
 {
 	int	i;
 
 	i = 0;
 	while (i < sim->number_of_coders)
 	{
-		pthread_join(sim->coders[i].thread, NULL);
+		pthread_mutex_destroy(&sim->dongles[i].mutex);
+		pthread_cond_destroy(&sim->dongles[i].cond);
+		heap_destroy(sim->dongles[i].waiting_heap);
+		free(sim->dongles[i].waiting_heap);
+		sim->dongles[i].waiting_heap = NULL;
 		i++;
 	}
+	free(sim->dongles);
+	sim->dongles = NULL;
+	free(sim->coders);
+	sim->coders = NULL;
+	return (true);
 }
 
-static void	init_compile_starts(t_simulation *sim)
+void	init_compile_starts(t_simulation *sim)
 {
 	int	i;
 
@@ -55,7 +64,7 @@ static void	init_compile_starts(t_simulation *sim)
 	}
 }
 
-static int	run_simulation(t_simulation *sim)
+int	run_simulation(t_simulation *sim)
 {
 	pthread_create(&sim->monitor_thread, NULL, burn_out_monitor, sim);
 	if (!start_coder_threads(sim))

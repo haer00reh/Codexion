@@ -12,7 +12,7 @@
 
 #include "Codexion.h"
 
-static bool	dongle_heap_init_failed(t_simulation *sim, int i)
+bool	dongle_heap_init_failed(t_simulation *sim, int i)
 {
 	free(sim->dongles[i].waiting_heap);
 	sim->dongles[i].waiting_heap = NULL;

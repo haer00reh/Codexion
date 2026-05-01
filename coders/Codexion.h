@@ -119,4 +119,27 @@ void	*runtime_coder_routine(void *arg);
 void	*burn_out_monitor(void *arg);
 void	print_coder_state(t_coder *coder, const char *state);
 
+void	wait_dongle_until_ready(t_dongle *dongle);
+void	set_ordered_dongles(t_coder *coder, t_dongle **first,
+			t_dongle **second);
+void	sleep_ms(long ms, t_simulation *sim);
+bool	take_dongles(t_coder *coder, t_dongle *first, t_dongle *second);
+bool	handle_single_coder(t_coder *coder, t_dongle *first);
+bool	should_stop_coder(t_coder *coder);
+bool	start_coder_threads(t_simulation *sim);
+void	join_coder_threads(t_simulation *sim);
+void	init_compile_starts(t_simulation *sim);
+int		run_simulation(t_simulation *sim);
+bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id);
+int		check_simulation_state(t_simulation *sim, long *current,
+			int *coder_id);
+void	finish_simulation(t_simulation *sim, int state, long current,
+			int coder_id);
+bool	dongle_heap_init_failed(t_simulation *sim, int i);
+bool	init_mutexes(t_simulation *sim);
+bool	parse_numeric_values(t_simulation *sim, char **av);
+bool	set_scheduler(t_simulation *sim, char *scheduler);
+bool	simulation_stopped(t_simulation *sim);
+bool	free_everything(t_simulation *sim);
+
 #endif

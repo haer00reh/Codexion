@@ -12,7 +12,7 @@
 
 #include "Codexion.h"
 
-static bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id)
+bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id)
 {
 	long	last_compile_start;
 
@@ -28,7 +28,7 @@ static bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id)
 	return (false);
 }
 
-static int	check_simulation_state(t_simulation *sim, long *current,
+int	check_simulation_state(t_simulation *sim, long *current,
 		int *coder_id)
 {
 	int	i;
@@ -52,7 +52,7 @@ static int	check_simulation_state(t_simulation *sim, long *current,
 	return (2);
 }
 
-static void	finish_simulation(t_simulation *sim, int state, long current,
+void	finish_simulation(t_simulation *sim, int state, long current,
 		int coder_id)
 {
 	if (state == 1)

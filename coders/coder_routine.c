@@ -12,17 +12,7 @@
 
 #include "Codexion.h"
 
-static bool	simulation_stopped(t_simulation *sim)
-{
-	bool	stopped;
-
-	pthread_mutex_lock(&sim->stop_mutex);
-	stopped = sim->stop;
-	pthread_mutex_unlock(&sim->stop_mutex);
-	return (stopped);
-}
-
-static void	set_ordered_dongles(t_coder *coder, t_dongle **first,
+void	set_ordered_dongles(t_coder *coder, t_dongle **first,
 		t_dongle **second)
 {
 	if (coder->left_dongle->id < coder->right_dongle->id)
@@ -37,7 +27,7 @@ static void	set_ordered_dongles(t_coder *coder, t_dongle **first,
 	}
 }
 
-static bool	handle_single_coder(t_coder *coder, t_dongle *first)
+bool	handle_single_coder(t_coder *coder, t_dongle *first)
 {
 	if (!acquire_dongle(coder, first))
 		return (false);
@@ -46,7 +36,7 @@ static bool	handle_single_coder(t_coder *coder, t_dongle *first)
 	return (true);
 }
 
-static bool	should_stop_coder(t_coder *coder)
+bool	should_stop_coder(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->sim->counter_mutex);
 	if (coder->compiles_done >= coder->sim->number_of_compiles_required)
