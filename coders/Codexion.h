@@ -85,6 +85,7 @@ typedef struct s_coder
 	int					compiles_done;
 	t_dongle			*left_dongle;
 	t_dongle			*right_dongle;
+	bool				has_finished;
 	struct s_simulation	*sim;
 }	t_coder;
 

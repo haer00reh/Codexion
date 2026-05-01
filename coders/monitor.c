@@ -6,7 +6,7 @@
 /*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/26 10:00:00 by haer-reh          #+#    #+#             */
-/*   Updated: 2026/04/26 10:00:00 by haer-reh         ###   ########.fr       */
+/*   Updated: 2026/05/01 16:18:37 by haer-reh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ bool	coder_burned_out(t_simulation *sim, int i, long *current, int *id)
 	pthread_mutex_unlock(&sim->counter_mutex);
 	if (sim->time_to_burnout <= 0)
 		return (false);
-	if (*current - last_compile_start > sim->time_to_burnout)
+	if (*current - last_compile_start > sim->time_to_burnout
+		&& sim->coders[i].has_finished != true)
 		return (true);
 	return (false);
 }

@@ -6,7 +6,7 @@
 /*   By: haer-reh <haer-reh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/26 10:00:00 by haer-reh          #+#    #+#             */
-/*   Updated: 2026/04/26 10:00:00 by haer-reh         ###   ########.fr       */
+/*   Updated: 2026/05/01 16:07:26 by haer-reh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ void	*runtime_coder_routine(void *arg)
 	set_ordered_dongles(coder, &first, &second);
 	pthread_mutex_lock(&coder->sim->counter_mutex);
 	coder->compiles_done = 0;
+	coder->has_finished = false;
 	pthread_mutex_unlock(&coder->sim->counter_mutex);
 	if (coder->sim->number_of_coders == 1)
 	{
