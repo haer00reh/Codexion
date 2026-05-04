@@ -13,7 +13,7 @@ This will create an executable file named `codexion`.
 For example:
 ```./codexion 5 800 200 100 300 3 50 fifo```
 This will run the program with 5 coders, a burnout time of 800ms, a compile time of 200ms, a debug time of 100ms, a refactor time of 300ms, a requirement of 3 compiles for each coder, a dongle cooldown of 50ms, and a FIFO scheduler.
-## how to cleanTo clean the project, you can use the following command in the terminal:
+## how to clean the project, you can use the following command in the terminal:
 ```make fclean```
 This will remove the executable file and any object files created during compilation.
 ## how to recompile To recompile the project, you can use the following command in the
