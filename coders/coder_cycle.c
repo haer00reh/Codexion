@@ -51,12 +51,12 @@ bool	take_dongles(t_coder *coder, t_dongle *first, t_dongle *second)
 {
 	if (!acquire_dongle(coder, first))
 		return (false);
-	if (!simulation_stopped(coder->sim))
-		print_coder_state(coder, "has taken a dongle");
 	if (second != first)
 	{
 		if (!acquire_dongle(coder, second))
 			return (release_dongle(coder, first), false);
+		if (!simulation_stopped(coder->sim))
+			print_coder_state(coder, "has taken a dongle");
 		if (!simulation_stopped(coder->sim))
 			print_coder_state(coder, "has taken a dongle");
 	}

@@ -17,6 +17,8 @@ void	wait_dongle_until_ready(t_dongle *dongle)
 	struct timespec	wake_at;
 	long			now;
 	long			remaining;
+	const long		ns = 1000000;
+	const long		ns_in_s = 1000000000;
 
 	now = get_timestamp_ms();
 	if (now < dongle->available_at)
@@ -24,11 +26,11 @@ void	wait_dongle_until_ready(t_dongle *dongle)
 		remaining = dongle->available_at - now;
 		clock_gettime(CLOCK_REALTIME, &wake_at);
 		wake_at.tv_sec += remaining / 1000;
-		wake_at.tv_nsec += (remaining % 1000) * 1000000;
-		if (wake_at.tv_nsec >= 1000000000)
+		wake_at.tv_nsec += (remaining % 1000) * ns;
+		if (wake_at.tv_nsec >= ns_in_s)
 		{
 			wake_at.tv_sec++;
-			wake_at.tv_nsec -= 1000000000;
+			wake_at.tv_nsec -= ns_in_s;
 		}
 		pthread_cond_timedwait(&dongle->cond, &dongle->mutex, &wake_at);
 	}

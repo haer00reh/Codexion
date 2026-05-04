@@ -1,6 +1,6 @@
 NAME = codexion
 
-CFLAGS = -Wall -Wextra -Werror -pthread 
+CFLAGS = -Wall -Wextra -Werror -pthread
 CC = clang
 
 FILES = coders/coder_cycle.c coders/coder_routine.c coders/dongle_access.c \
