@@ -16,7 +16,7 @@ This will run the program with 5 coders, a burnout time of 800ms, a compile time
 ## how to clean the project, you can use the following command in the terminal:
 ```make fclean```
 This will remove the executable file and any object files created during compilation.
-'''make clean'''
+```make clean```
 to remove only the object files
 ## how to recompile To recompile the project, you can use the following command in the
 terminal:
