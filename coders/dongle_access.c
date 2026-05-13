@@ -14,28 +14,29 @@
 
 void	wait_dongle_until_ready(t_dongle *dongle)
 {
-	struct timespec	wake_at;
-	long			now;
-	long			remaining;
-	const long		ns = 1000000;
-	const long		ns_in_s = 1000000000;
+	struct timespec		ts;
+	struct timeval		tv;
+	long				now_ms;
+	long				remaining;
 
-	now = get_timestamp_ms();
-	if (now < dongle->available_at)
+	now_ms = get_timestamp_ms();
+	if (now_ms < dongle->available_at)
 	{
-		remaining = dongle->available_at - now;
-		clock_gettime(CLOCK_REALTIME, &wake_at);
-		wake_at.tv_sec += remaining / 1000;
-		wake_at.tv_nsec += (remaining % 1000) * ns;
-		if (wake_at.tv_nsec >= ns_in_s)
+		remaining = dongle->available_at - now_ms;
+		gettimeofday(&tv, NULL);
+		ts.tv_sec = tv.tv_sec + remaining / 1000;
+		ts.tv_nsec = (tv.tv_usec * 1000) + (remaining % 1000) * 1000000L;
+		if (ts.tv_nsec >= 1000000000L)
 		{
-			wake_at.tv_sec++;
-			wake_at.tv_nsec -= ns_in_s;
+			ts.tv_sec += 1;
+			ts.tv_nsec -= 1000000000L;
 		}
-		pthread_cond_timedwait(&dongle->cond, &dongle->mutex, &wake_at);
+		pthread_cond_timedwait(&dongle->cond, &dongle->mutex, &ts);
 	}
 	else
+	{
 		pthread_cond_wait(&dongle->cond, &dongle->mutex);
+	}
 }
 
 bool	can_take_dongle(t_coder *coder, t_dongle *dongle)
