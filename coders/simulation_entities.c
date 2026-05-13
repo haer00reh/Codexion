@@ -68,6 +68,7 @@ bool	init_coder(t_simulation *sim)
 		sim->coders[i].thread = 0;
 		sim->coders[i].last_compile_start = 0;
 		sim->coders[i].compiles_done = 0;
+		sim->coders[i].has_finished = false;
 		sim->coders[i].left_dongle = &sim->dongles[i];
 		sim->coders[i].right_dongle = &sim->dongles[(i + 1)
 			% sim->number_of_coders];
